@@ -33,7 +33,7 @@ public class CivitAiImageService : IImageService
 
             foreach (var img in response.items)
             {
-                if (_seenUrls.Add(img.url)) // Only process new images
+                if (_seenUrls.Add(img.url) && true) // Only process new images
                     await _publisher.Publish(new NewImageNotification(new ImageData(img.url, img.id.ToString())), ct);
             }
         }

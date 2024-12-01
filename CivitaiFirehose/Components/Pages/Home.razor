@@ -27,18 +27,67 @@
     {
         _hubConnection = new HubConnectionBuilder()
         .WithUrl(Navigation.ToAbsoluteUri("/imagehub"))
-        .WithAutomaticReconnect()
+        .WithAutomaticReconnect([TimeSpan.Zero, TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(5)])
         .Build();
-
+        
         _hubConnection.On<ImageData>("NewImage", img =>
             {
                 _images.Insert(0, img);
                 if (_images.Count > MaxImages)
                     _images.RemoveAt(_images.Count - 1);
-                StateHasChanged();
-            });
 
-        await _hubConnection.StartAsync();
+                InvokeAsync(StateHasChanged);
+            });
+        
+        _hubConnection.Closed += async (error) =>
+        {
+            Console.WriteLine($"Connection closed: {error?.Message}");
+            
+            await Task.Delay(new Random().Next(0, 5) * 1000);
+            await _hubConnection.StartAsync();
+            await _hubConnection.InvokeAsync("ClientReady", _hubConnection.ConnectionId);
+        };
+
+        _hubConnection.Reconnecting += (error) =>
+        {
+            Console.WriteLine($"Reconnecting: {error?.Message}");
+            return Task.CompletedTask;
+        };
+
+        _hubConnection.Reconnected += (connectionId) =>
+        {
+            Console.WriteLine($"Reconnected with ID: {connectionId}");
+            return Task.CompletedTask;
+        };
+
+        await ConnectToHub();
+    }
+    
+    private async Task ConnectToHub()
+    {
+        try 
+        {
+            if (_hubConnection.State != HubConnectionState.Connected)
+            {
+                _hubConnection.On<ImageData>("NewImage", img =>
+                {
+                    _images.Insert(0, img);
+                    if (_images.Count > MaxImages)
+                        _images.RemoveAt(_images.Count - 1);
+                    InvokeAsync(StateHasChanged);
+                });
+
+                await _hubConnection.StartAsync();
+                await _hubConnection.InvokeAsync("ClientReady", _hubConnection.ConnectionId);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to connect: {ex.Message}");
+            // Try again after a delay
+            await Task.Delay(5000);
+            await ConnectToHub();
+        }
     }
 
     public async ValueTask DisposeAsync()
