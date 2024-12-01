@@ -1,9 +1,17 @@
+using System.Reflection;
+using CivitaiFirehose;
 using CivitaiFirehose.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
+
+builder.Services.AddHttpClient();
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+builder.Services.AddSingleton<IImageService, CivitAiImageService>();
+builder.Services.AddHostedService<ImageBackgroundService>();
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 

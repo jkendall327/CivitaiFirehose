@@ -1,7 +1,49 @@
 ﻿@page "/"
+@inject NavigationManager Navigation
+@using Microsoft.AspNetCore.SignalR.Client
+@implements IAsyncDisposable
 
-<PageTitle>Home</PageTitle>
+<div class="grid grid-cols-4 gap-4 p-4">
+    @foreach (var img in _images)
+    {
+        <div class="relative">
+            <img src="@img.Url" alt="@img.Title" class="w-full h-48 object-cover rounded-lg" />
+            @if (!string.IsNullOrEmpty(img.Title))
+            {
+                <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 rounded-b-lg">
+                    @img.Title
+                </div>
+            }
+        </div>
+    }
+</div>
 
-<h1>Hello, world!</h1>
+@code {
+    HubConnection? _hubConnection;
+    List<ImageData> _images = new();
+    const int MaxImages = 20;
 
-Welcome to your new app.
+    protected override async Task OnInitializedAsync()
+    {
+        _hubConnection = new HubConnectionBuilder()
+        .WithUrl(Navigation.ToAbsoluteUri("/imagehub"))
+        .WithAutomaticReconnect()
+        .Build();
+
+        _hubConnection.On<ImageData>("NewImage", img =>
+            {
+                _images.Insert(0, img);
+                if (_images.Count > MaxImages)
+                    _images.RemoveAt(_images.Count - 1);
+                StateHasChanged();
+            });
+
+        await _hubConnection.StartAsync();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_hubConnection is not null)
+            await _hubConnection.DisposeAsync();
+    }
+}
