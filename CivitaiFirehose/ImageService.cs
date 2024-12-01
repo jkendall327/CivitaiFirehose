@@ -28,13 +28,13 @@ public class CivitAiImageService : IImageService
     {
         try
         {
-            var response = await _http.GetFromJsonAsync<ApiResponse>("https://civitai.com/api/v1/images?sort=Newest", ct);
-            if (response?.Images == null) return;
+            var response = await _http.GetFromJsonAsync<RootObject>("https://civitai.com/api/v1/images?sort=Newest&limit=5", ct);
+            if (response?.items == null) return;
 
-            foreach (var img in response.Images)
+            foreach (var img in response.items)
             {
-                if (_seenUrls.Add(img.Url)) // Only process new images
-                    await _publisher.Publish(new NewImageNotification(new ImageData(img.Url, img.Title)), ct);
+                if (_seenUrls.Add(img.url)) // Only process new images
+                    await _publisher.Publish(new NewImageNotification(new ImageData(img.url, img.id.ToString())), ct);
             }
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
@@ -44,6 +44,88 @@ public class CivitAiImageService : IImageService
     }
 }
 
-// Models for API response
-public record ApiResponse(List<ApiImage> Images);
-public record ApiImage(string Url, string? Title);
+public record RootObject(
+    Items[] items,
+    Metadata metadata
+);
+
+public record Items(
+    int id,
+    string url,
+    string hash,
+    int width,
+    int height,
+    string nsfwLevel,
+    bool nsfw,
+    int browsingLevel,
+    string createdAt,
+    int postId,
+    Stats stats,
+    Meta meta,
+    string username,
+    string baseModel
+);
+
+public record Stats(
+    int cryCount,
+    int laughCount,
+    int likeCount,
+    int dislikeCount,
+    int heartCount,
+    int commentCount
+);
+
+public record Meta(
+    string Size,
+    long seed,
+    string Model,
+    int steps,
+    Hashes hashes,
+    string prompt,
+    string Version,
+    string sampler,
+    string CFG_Scale,
+    Resources[] resources,
+    string Model_hash,
+    string negativePrompt,
+    bool nsfw,
+    bool draft,
+    Extra extra,
+    int width,
+    int height,
+    float? cfgScale,
+    int clipSkip,
+    int quantity,
+    string workflow,
+    string baseModel,
+    string Created_Date,
+    bool fluxUltraRaw,
+    CivitaiResources[] civitaiResources
+);
+
+public record Hashes(
+    string model
+);
+
+public record Resources(
+    string hash,
+    string name,
+    string type
+);
+
+public record Extra(
+    int remixOfId
+);
+
+public record CivitaiResources(
+    string type,
+    int modelVersionId,
+    string modelVersionName,
+    float weight
+);
+
+public record Metadata(
+    string nextCursor,
+    string nextPage
+);
+

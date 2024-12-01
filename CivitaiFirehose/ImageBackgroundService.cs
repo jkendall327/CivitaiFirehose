@@ -17,7 +17,7 @@ public class ImageBackgroundService : BackgroundService
     {
         try
         {
-            using var timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
+            using var timer = new PeriodicTimer(TimeSpan.FromSeconds(5));
             
             while (await timer.WaitForNextTickAsync(ct))
                 await _imageService.StartMonitoring(ct);

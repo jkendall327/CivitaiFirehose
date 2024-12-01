@@ -5,6 +5,7 @@ using CivitaiFirehose.Components;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddRazorPages();
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
 builder.Services.AddHttpClient();
@@ -24,10 +25,14 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseStaticFiles();
+app.UseRouting();
 app.UseAntiforgery();
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
+app.MapHub<ImageHub>("/imagehub");  // Add this line
+app.MapBlazorHub();
+//app.MapFallbackToPage("/_Host");
 
 app.Run();
