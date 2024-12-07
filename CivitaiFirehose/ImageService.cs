@@ -7,7 +7,7 @@ public interface IImageService
     List<ImageModel> GetImages();
 }
 
-public class CivitAiImageService(HttpClient http, ILogger<CivitAiImageService> logger) : IImageService
+public class CivitAiImageService(CivitaiClient client, ILogger<CivitAiImageService> logger) : IImageService
 {
     private readonly HashSet<string> _seenUrls = new();
     private readonly Stack<ImageModel> _images = new(20);
@@ -16,8 +16,7 @@ public class CivitAiImageService(HttpClient http, ILogger<CivitAiImageService> l
     {
         try
         {
-            var response = await http.GetFromJsonAsync<CivitaiResponse>("https://civitai.com/api/v1/images?sort=Newest&limit=30", ct);
-            if (response?.items == null) return;
+            var response = await client.GetImages(ct);
 
             var any = false;
             
