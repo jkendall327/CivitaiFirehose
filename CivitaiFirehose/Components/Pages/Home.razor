@@ -5,6 +5,7 @@
 <div class="grid grid-cols-4 gap-4 p-4">
     @foreach (var img in _images)
     {
+        <p>foobar</p>
         <div class="relative">
             <img src="@img.Url" alt="@img.Title" class="w-full h-48 object-cover rounded-lg" />
             @if (!string.IsNullOrEmpty(img.Title))
@@ -18,9 +19,9 @@
 </div>
 
 @code {
-    const int MaxImages = 20;
-
-    private List<ImageModel> _images = new();
+    private List<ImageModel> _images { get; set; } = new()
+    {
+    };
     
     protected override void OnInitialized()
     {
@@ -29,11 +30,13 @@
 
     private async Task SetImages()
     {
-        await InvokeAsync(() => _images = ImageService.GetImages());
+        _images = ImageService.GetImages();
+
+        await InvokeAsync(StateHasChanged);
     }
 
     public void Dispose()
     {
-        ImageService.NewImagesFound -= SetImages;
+        //ImageService.NewImagesFound -= SetImages;
     }
 }
