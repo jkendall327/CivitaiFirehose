@@ -1,5 +1,6 @@
 ﻿@page "/"
-@implements IAsyncDisposable
+@inject IImageService ImageService
+@implements IDisposable
 
 <div class="grid grid-cols-4 gap-4 p-4">
     @foreach (var img in _images)
@@ -19,13 +20,20 @@
 @code {
     const int MaxImages = 20;
 
-    private List<dynamic> _images = new();
+    private List<ImageModel> _images = new();
     
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
+        ImageService.NewImagesFound += SetImages; 
     }
 
-    public async ValueTask DisposeAsync()
+    private async Task SetImages()
     {
+        await InvokeAsync(() => _images = ImageService.GetImages());
+    }
+
+    public void Dispose()
+    {
+        ImageService.NewImagesFound -= SetImages;
     }
 }
