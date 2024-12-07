@@ -16,7 +16,7 @@ public class CivitAiImageService(HttpClient http, ILogger<CivitAiImageService> l
     {
         try
         {
-            var response = await http.GetFromJsonAsync<CivitaiResponse>("https://civitai.com/api/v1/images?sort=Newest&limit=5", ct);
+            var response = await http.GetFromJsonAsync<CivitaiResponse>("https://civitai.com/api/v1/images?sort=Newest&limit=30", ct);
             if (response?.items == null) return;
 
             var any = false;
