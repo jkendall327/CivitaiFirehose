@@ -1,11 +1,12 @@
 ﻿@page "/"
-@inject IImageService ImageService
 @implements IDisposable
+@rendermode InteractiveServer
+@inject IImageService ImageService
+@inject ILogger<Home> Logger
 
 <div class="grid grid-cols-4 gap-4 p-4">
     @foreach (var img in _images)
     {
-        <p>foobar</p>
         <div class="relative">
             <img src="@img.Url" alt="@img.Title" class="w-full h-48 object-cover rounded-lg" />
             @if (!string.IsNullOrEmpty(img.Title))
@@ -19,24 +20,29 @@
 </div>
 
 @code {
-    private List<ImageModel> _images { get; set; } = new()
-    {
-    };
+    private List<ImageModel> _images = new();
     
     protected override void OnInitialized()
     {
-        ImageService.NewImagesFound += SetImages; 
+        Logger.LogInformation("Entered OnInitialized");
+        _images = ImageService.GetImages();
+        ImageService.NewImagesFound += SetImages;
     }
 
     private async Task SetImages()
     {
-        _images = ImageService.GetImages();
-
-        await InvokeAsync(StateHasChanged);
+        Logger.LogInformation("Just entered SetImages");
+        
+        await InvokeAsync(() => {
+            _images = ImageService.GetImages();
+            Logger.LogInformation("Just set images");
+            StateHasChanged();
+        });
     }
 
     public void Dispose()
     {
-        //ImageService.NewImagesFound -= SetImages;
+        Logger.LogInformation("Disposing Home");
+        ImageService.NewImagesFound -= SetImages;
     }
 }
