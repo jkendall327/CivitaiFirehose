@@ -9,10 +9,8 @@ builder.Services.AddRazorPages();
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
 builder.Services.AddHttpClient();
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 builder.Services.AddSingleton<IImageService, CivitAiImageService>();
 builder.Services.AddHostedService<ImageBackgroundService>();
-builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -31,8 +29,6 @@ app.UseAntiforgery();
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
-app.MapHub<ImageHub>("/imagehub");  // Add this line
 app.MapBlazorHub();
-//app.MapFallbackToPage("/_Host");
 
 app.Run();

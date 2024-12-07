@@ -20,7 +20,7 @@ public class ImageBackgroundService : BackgroundService
             using var timer = new PeriodicTimer(TimeSpan.FromSeconds(5));
             
             while (await timer.WaitForNextTickAsync(ct))
-                await _imageService.StartMonitoring(ct);
+                await _imageService.PollCivitai(ct);
         }
         catch (OperationCanceledException)
         {

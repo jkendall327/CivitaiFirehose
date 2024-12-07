@@ -1,30 +1,25 @@
-using MediatR;
-
 namespace CivitaiFirehose;
 
 public interface IImageService
 {
-    Task StartMonitoring(CancellationToken ct);
+    Task PollCivitai(CancellationToken ct);
 }
 
 public class CivitAiImageService : IImageService
 {
     readonly HttpClient _http;
     readonly ILogger<CivitAiImageService> _logger;
-    readonly IPublisher _publisher;
     readonly HashSet<string> _seenUrls = new();
     
     public CivitAiImageService(
         HttpClient http, 
-        ILogger<CivitAiImageService> logger,
-        IPublisher publisher)
+        ILogger<CivitAiImageService> logger)
     {
         _http = http;
         _logger = logger;
-        _publisher = publisher;
     }
 
-    public async Task StartMonitoring(CancellationToken ct)
+    public async Task PollCivitai(CancellationToken ct)
     {
         try
         {
@@ -34,7 +29,9 @@ public class CivitAiImageService : IImageService
             foreach (var img in response.items)
             {
                 if (_seenUrls.Add(img.url) && true) // Only process new images
-                    await _publisher.Publish(new NewImageNotification(new ImageData(img.url, img.id.ToString())), ct);
+                {
+                    ;
+                }
             }
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
