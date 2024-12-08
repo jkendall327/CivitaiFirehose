@@ -11,6 +11,9 @@ public class CivitaiPollingBackgroundService(
     {
         try
         {
+            // Run immediately once on startup.
+            await civitaiPoller.PollCivitai(ct);
+
             var period = options.Value.PollingPeriod;
             
             logger.LogInformation("Polling Civitai every {PollingPeriod}", period);
