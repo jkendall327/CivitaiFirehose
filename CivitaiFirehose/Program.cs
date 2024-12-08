@@ -11,10 +11,20 @@ builder.Services.AddSingleton(channel.Writer);
 builder.Services.AddSingleton(channel.Reader);
 
 builder.Services.Configure<CivitaiSettings>(builder.Configuration.GetSection(nameof(CivitaiSettings)));
+
 builder.Services.AddHttpClient<CivitaiClient>();
+builder.Services.AddHttpClient<HydrusClient>(s =>
+{
+    // TODO: get from config.
+    s.BaseAddress = new("http://127.0.0.1:45869/");
+    s.DefaultRequestHeaders.Add("Hydrus-Client-API-Access-Key", "0f7990f1516a53b2af4bd717df380005e9c17e880139ce0157e85d401b027846");
+});
+
 builder.Services.AddScoped<JsService>();
 builder.Services.AddSingleton<ICivitaiPoller, CivitaiPoller>();
+
 builder.Services.AddHostedService<CivitaiPollingBackgroundService>();
+builder.Services.AddHostedService<HydrusPusherBackgroundService>();
 
 var app = builder.Build();
 
