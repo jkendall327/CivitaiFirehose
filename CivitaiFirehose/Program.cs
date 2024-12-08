@@ -1,6 +1,7 @@
 using System.Threading.Channels;
 using CivitaiFirehose;
 using CivitaiFirehose.Components;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,13 +12,14 @@ builder.Services.AddSingleton(channel.Writer);
 builder.Services.AddSingleton(channel.Reader);
 
 builder.Services.Configure<CivitaiSettings>(builder.Configuration.GetSection(nameof(CivitaiSettings)));
+builder.Services.Configure<HydrusSettings>(builder.Configuration.GetSection(nameof(HydrusSettings)));
 
 builder.Services.AddHttpClient<CivitaiClient>();
-builder.Services.AddHttpClient<HydrusClient>(s =>
+builder.Services.AddHttpClient<HydrusClient>((s, c) =>
 {
-    // TODO: get from config.
-    s.BaseAddress = new("http://127.0.0.1:45869/");
-    s.DefaultRequestHeaders.Add("Hydrus-Client-API-Access-Key", "0f7990f1516a53b2af4bd717df380005e9c17e880139ce0157e85d401b027846");
+    var opt = s.GetRequiredService<IOptions<HydrusSettings>>().Value;
+    c.BaseAddress = new(opt.BaseUrl);
+    c.DefaultRequestHeaders.Add("Hydrus-Client-API-Access-Key", opt.ApiKey);
 });
 
 builder.Services.AddScoped<JsService>();
