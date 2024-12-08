@@ -28,31 +28,57 @@ public class CivitaiPoller(CivitaiClient client, ILogger<CivitaiPoller> logger) 
         var response = await client.GetImages(ct);
 
         var found = 0;
-            
+
         foreach (var img in response.items)
         {
-            var postUrl = $"https://civitai.com/posts/{img.postId.ToString()}";
-
-            var image = new ImageModel(img.url, postUrl);
-            
-            if (_images.Contains(image))
+            if (_images.Any(s => s.ImageUrl == img.url))
             {
                 continue;
             }
-                
-            found++;
             
+            var postUrl = $"https://civitai.com/posts/{img.postId.ToString()}";
+
+            var tags = GetTagsFromResponse(img);
+            
+            var image = new ImageModel(img.url, postUrl, tags);
+
+            found++;
+
             _images.Push(image);
         }
-            
+
         if (found > 0)
         {
             logger.LogInformation("Found {NewImages} new images", found);
-                
+
             // Tell the UI we have new images.
             var t = NewImagesFound?.Invoke(found);
             if (t != null) await t;
         }
+    }
+
+    private static List<string> GetTagsFromResponse(Items item)
+    {
+        var tags = new HashSet<string>
+        {
+            $"id:{item.id}",
+            $"nsfw level:{item.nsfwLevel}",
+            $"browsing level:{item.browsingLevel}",
+            $"username:{item.username}",
+            $"base model:{item.baseModel}"
+        };
+
+        if (!string.IsNullOrWhiteSpace(item.meta.prompt))
+        {
+            tags.Add($"prompt:{item.meta.prompt.Replace("\n", " ").Trim()}");
+        }
+
+        if (!string.IsNullOrWhiteSpace(item.meta.negativePrompt))
+        {
+            tags.Add($"negative prompt:{item.meta.negativePrompt.Replace("\n", " ").Trim()}");
+        }
+
+        return tags.ToList();
     }
 
     public List<ImageModel> GetImages() => _images.ToList();
