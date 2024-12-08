@@ -2,6 +2,7 @@
 @implements IDisposable
 @rendermode InteractiveServer
 @inject IImageService ImageService
+@inject IJSRuntime JS
 @inject ILogger<Home> Logger
 
 <HeadContent>
@@ -62,12 +63,13 @@
 
     private async Task SetImages(int newCount)
     {
-        await InvokeAsync(() => {
+        await InvokeAsync(async () => {
             _images = ImageService.GetImages();
             
             Logger.LogInformation("Got {ImageCount} new images from service, updating UI", newCount);
 
             PageTitle = $"Civitai Firehose ({newCount})";
+            await JS.InvokeVoidAsync("eval", $"document.title = '{PageTitle}'");
             
             StateHasChanged();
         });
