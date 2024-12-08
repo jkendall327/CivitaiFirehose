@@ -93,7 +93,7 @@ public class CivitaiImageQuery
         if (ModelId.HasValue) dict.Add("modelId", ModelId.Value.ToString());
         if (ModelVersionId.HasValue) dict.Add("modelVersionId", ModelVersionId.Value.ToString());
         if (Username is { } username) dict.Add("username", username);
-        if (Nsfw.HasValue) dict.Add("nsfw", Nsfw.Value.ToString().ToLowerInvariant());
+        if (Nsfw.HasValue) dict.Add("nsfw", Nsfw.Value.ToString());
         if (Period.HasValue) dict.Add("period", Period.Value.ToString().ToLowerInvariant());
         if (Page.HasValue) dict.Add("page", Page.Value.ToString());
         

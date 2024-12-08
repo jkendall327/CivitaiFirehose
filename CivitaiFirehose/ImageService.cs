@@ -9,7 +9,6 @@ public interface IImageService
 
 public class CivitaiImageService(CivitaiClient client, ILogger<CivitaiImageService> logger) : IImageService
 {
-    private readonly HashSet<string> _seenUrls = new();
     private readonly Stack<ImageModel> _images = new(20);
 
     public async Task PollCivitai(CancellationToken ct)
@@ -32,14 +31,18 @@ public class CivitaiImageService(CivitaiClient client, ILogger<CivitaiImageServi
             
         foreach (var img in response.items)
         {
-            // Only process new images.
-            if (!_seenUrls.Add(img.url)) continue;
+            var postUrl = $"https://civitai.com/posts/{img.postId.ToString()}";
+
+            var image = new ImageModel(img.url, postUrl);
+            
+            if (_images.Contains(image))
+            {
+                continue;
+            }
                 
             found++;
-                    
-            var postUrl = $"https://civitai.com/posts/{img.postId.ToString()}";
-                    
-            _images.Push(new(img.url, postUrl));
+            
+            _images.Push(image);
         }
             
         if (found > 0)
