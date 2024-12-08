@@ -12,8 +12,6 @@
 </HeadContent>
 
 <div class="grid-container">
-@if (_images.Count > 0)
-{
     @foreach (var image in _images)
     {
         <div class="grid-item">
@@ -27,7 +25,6 @@
             </div>
         </div>
     }
-}
 </div>
 
 <style>
