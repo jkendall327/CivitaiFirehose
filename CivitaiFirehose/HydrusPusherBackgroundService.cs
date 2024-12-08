@@ -21,7 +21,7 @@ public class HydrusPusherBackgroundService(
             
             var hash = await client.SendImageToHydrus(bytes);
 
-            await client.AssociateUrlWithImage(hash, [image.ImageUrl]);
+            await client.AssociateUrlWithImage(hash, [image.ImageUrl, image.PostUrl]);
 
             var service = services["my tags"];
             
