@@ -1,3 +1,3 @@
 namespace CivitaiFirehose;
 
-public record ImageModel(string Url, string? Title);
+public record ImageModel(string ImageUrl, string PostUrl);

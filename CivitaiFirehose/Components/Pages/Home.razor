@@ -7,11 +7,15 @@
 <div class="grid-container">
     @if (_images.Count > 0)
     {
-        @for (int i = 0; i < _images.Count; i++)
+        @for (var i = 0; i < _images.Count; i++)
         {
-            var imageUrl = i < _images.Count ? _images[i].Url : "/api/placeholder/300/300";
+            var imageUrl = i < _images.Count ? _images[i].ImageUrl : "/api/placeholder/300/300";
+            var postUrl = i < _images.Count ? _images[i].PostUrl : string.Empty;
+            
             <div class="grid-item">
-                <img src="@imageUrl" alt="Grid Item @(i + 1)">
+                <a href="@postUrl">
+                    <img src="@imageUrl" alt="Grid Item @(i + 1)">
+                </a>
             </div>
         }
     }

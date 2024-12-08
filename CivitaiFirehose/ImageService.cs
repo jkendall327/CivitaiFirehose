@@ -25,7 +25,7 @@ public class CivitAiImageService(CivitaiClient client, ILogger<CivitAiImageServi
                 if (_seenUrls.Add(img.url)) // Only process new images
                 {
                     any = true;
-                    _images.Push(new(img.url, img.postId.ToString()));
+                    _images.Push(new(img.url, $"https://civitai.com/images/{img.postId.ToString()}"));
                 }
             }
 
