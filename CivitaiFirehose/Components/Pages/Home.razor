@@ -1,7 +1,9 @@
 ﻿@page "/"
+@using System.Threading.Channels
 @implements IDisposable
 @rendermode InteractiveServer
 @inject ICivitaiPoller CivitaiPoller
+@inject ChannelWriter<ImageModel> Writer
 @inject JsService JsService
 @inject ILogger<Home> Logger
 
@@ -132,16 +134,16 @@
 
         await JsService.SetTabTitle(PageTitle);
     }
+    
+    private async Task OnImageButtonClick(ImageModel image)
+    {
+        Logger.LogInformation("Sending {ImageUrl} to Hydrus service", image.ImageUrl);
+        await Writer.WriteAsync(image);
+    }
 
     public void Dispose()
     {
         CivitaiPoller.NewImagesFound -= SetImages;
         JsService.Dispose();
-    }
-
-    private Task OnImageButtonClick(ImageModel image)
-    {
-        Logger.LogInformation("Clicked {ImageUrl}", image.ImageUrl);
-        return Task.CompletedTask;
     }
 }

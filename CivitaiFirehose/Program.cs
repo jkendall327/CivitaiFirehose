@@ -1,9 +1,14 @@
+using System.Threading.Channels;
 using CivitaiFirehose;
 using CivitaiFirehose.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
+
+var channel = Channel.CreateUnbounded<ImageModel>();
+builder.Services.AddSingleton(channel.Writer);
+builder.Services.AddSingleton(channel.Reader);
 
 builder.Services.Configure<CivitaiSettings>(builder.Configuration.GetSection(nameof(CivitaiSettings)));
 builder.Services.AddHttpClient<CivitaiClient>();
