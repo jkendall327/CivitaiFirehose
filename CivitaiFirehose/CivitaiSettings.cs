@@ -5,6 +5,7 @@ namespace CivitaiFirehose;
 
 public class CivitaiSettings
 {
+    public TimeSpan PollingPeriod { get; set; }
     public CivitaiImageQuery QueryDefaults { get; set; } = new();
 }
 

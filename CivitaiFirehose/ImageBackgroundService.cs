@@ -1,12 +1,21 @@
+using Microsoft.Extensions.Options;
+
 namespace CivitaiFirehose;
 
-public class ImageBackgroundService(IImageService imageService, ILogger<ImageBackgroundService> logger) : BackgroundService
+public class ImageBackgroundService(
+    IImageService imageService,
+    IOptions<CivitaiSettings> options,
+    ILogger<ImageBackgroundService> logger) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken ct)
     {
         try
         {
-            using var timer = new PeriodicTimer(TimeSpan.FromSeconds(5));
+            var period = options.Value.PollingPeriod;
+            
+            logger.LogInformation("Polling Civitai every {PollingPeriod}", period);
+            
+            using var timer = new PeriodicTimer(period);
             
             while (await timer.WaitForNextTickAsync(ct))
             {
