@@ -1,14 +1,15 @@
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 
 namespace CivitaiFirehose;
 
-public class CivitaiClient(HttpClient client, IOptions<CivitaiSettings> options)
+public class CivitaiClient(HttpClient client, IOptionsMonitor<CivitaiSettings> options)
 {
     public async Task<CivitaiResponse> GetImages(CancellationToken cancellationToken = default)
     {
-        var opt = options.Value;
-
-        var uri = $"https://civitai.com/api/v1/images?sort=Newest&limit={opt.ImageCount}";
+        var opt = options.CurrentValue.QueryDefaults;
+        
+        var uri = QueryHelpers.AddQueryString("https://civitai.com/api/v1/images", opt.ToDictionary());
         
         var response = await client.GetFromJsonAsync<CivitaiResponse>(uri, cancellationToken);
 
