@@ -7,6 +7,7 @@ builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
 builder.Services.Configure<CivitaiSettings>(builder.Configuration.GetSection(nameof(CivitaiSettings)));
 builder.Services.AddHttpClient<CivitaiClient>();
+builder.Services.AddScoped<JsService>();
 builder.Services.AddSingleton<IImageService, CivitaiImageService>();
 builder.Services.AddHostedService<ImageBackgroundService>();
 
