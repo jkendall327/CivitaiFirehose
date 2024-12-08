@@ -65,7 +65,7 @@ public class CivitaiPoller(CivitaiClient client, ILogger<CivitaiPoller> logger) 
             $"image id:{item.id}",
             $"post id:{item.postId}",
             $"nsfw level:{item.nsfwLevel}",
-            $"username:{item.username}",
+            $"creator:{item.username}",
             $"base model:{item.baseModel}"
         };
         
@@ -73,7 +73,24 @@ public class CivitaiPoller(CivitaiClient client, ILogger<CivitaiPoller> logger) 
 
         if (!string.IsNullOrWhiteSpace(item.meta.prompt))
         {
-            tags.Add($"prompt:{item.meta.prompt.Replace("\n", " ").Trim()}");
+            var prompt = item.meta.prompt.Replace("\n", " ").Trim();
+            tags.Add($"prompt:{prompt}");
+
+            var promptedTags = prompt
+                .Split(",")
+                .Select(x =>
+                {
+                    // Gets rid of some syntax when invoking LORAs in prompts.
+                    x = x.Replace("<", string.Empty).Replace(">", string.Empty);
+                    return x.Trim();
+                })
+                .Where(s => !string.IsNullOrWhiteSpace(s))
+                .ToList();
+            
+            foreach (var promptedTag in promptedTags)
+            {
+                tags.Add(promptedTag);
+            }
         }
 
         if (!string.IsNullOrWhiteSpace(item.meta.negativePrompt))
