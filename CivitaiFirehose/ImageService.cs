@@ -3,7 +3,7 @@ namespace CivitaiFirehose;
 public interface IImageService
 {
     Task PollCivitai(CancellationToken ct);
-    Func<Task>? NewImagesFound { get; set; }
+    Func<int, Task>? NewImagesFound { get; set; }
     List<ImageModel> GetImages();
 }
 
@@ -50,12 +50,12 @@ public class CivitaiImageService(CivitaiClient client, ILogger<CivitaiImageServi
             logger.LogInformation("Found {NewImages} new images", found);
                 
             // Tell the UI we have new images.
-            var t = NewImagesFound?.Invoke();
+            var t = NewImagesFound?.Invoke(found);
             if (t != null) await t;
         }
     }
 
     public List<ImageModel> GetImages() => _images.ToList();
 
-    public Func<Task>? NewImagesFound { get; set; }
+    public Func<int, Task>? NewImagesFound { get; set; }
 }

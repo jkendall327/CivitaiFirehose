@@ -4,6 +4,10 @@
 @inject IImageService ImageService
 @inject ILogger<Home> Logger
 
+<HeadContent>
+    <PageTitle>@PageTitle</PageTitle>
+</HeadContent>
+
 <div class="grid-container">
     @if (_images.Count > 0)
     {
@@ -47,6 +51,8 @@
 
 @code {
     private List<ImageModel> _images = [];
+
+    public string PageTitle { get; set; } = "Civitai Firehose";
     
     protected override void OnInitialized()
     {
@@ -54,11 +60,15 @@
         ImageService.NewImagesFound += SetImages;
     }
 
-    private async Task SetImages()
+    private async Task SetImages(int newCount)
     {
         await InvokeAsync(() => {
             _images = ImageService.GetImages();
-            Logger.LogInformation("Got {ImageCount} images from service, updating UI", _images.Count);
+            
+            Logger.LogInformation("Got {ImageCount} new images from service, updating UI", newCount);
+
+            PageTitle = $"Civitai Firehose ({newCount})";
+            
             StateHasChanged();
         });
     }
