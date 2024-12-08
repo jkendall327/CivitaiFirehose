@@ -10,19 +10,13 @@
 </HeadContent>
 
 <div class="grid-container">
-    @if (_images.Count > 0)
+    @foreach (var image in _images)
     {
-        @for (var i = 0; i < _images.Count; i++)
-        {
-            var imageUrl = i < _images.Count ? _images[i].ImageUrl : "/api/placeholder/300/300";
-            var postUrl = i < _images.Count ? _images[i].PostUrl : string.Empty;
-            
-            <div class="grid-item">
-                <a href="@postUrl">
-                    <img src="@imageUrl" alt="Grid Item @(i + 1)">
-                </a>
-            </div>
-        }
+        <div class="grid-item">
+            <a href="@image.PostUrl">
+                <img src="@image.ImageUrl" alt="Grid Item">
+            </a>
+        </div>
     }
 </div>
 
