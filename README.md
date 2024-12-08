@@ -11,6 +11,12 @@ It was a pain manually saving all the cool pictures I saw, so I made this app to
 I typically organise my media in an app called the Hydrus Network, so I additionally added some functionality to quickly
 send interesting images to it for download via its built-in REST API.
 
+At some point I will try to document my design choices here, but most of the choices should be fairly unsurprising.
+
+I make no claim this code will be useful to anyone else, but you're welcome to use it if you would like to.
+
+Compilation should be as simple as 'dotnet run'.
+
 ## TODO
 - Let users enter own search term/query for more specialised live hose
 - Let users change sort mode etc. in UI, rather than editing config
