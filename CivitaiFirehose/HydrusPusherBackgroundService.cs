@@ -9,6 +9,8 @@ public class HydrusPusherBackgroundService(
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        await client.VerifyAccess();
+        
         await foreach (var image in channel.ReadAllAsync(stoppingToken))
         {
             await client.SendImageToHydrus(image.ImageUrl);

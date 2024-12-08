@@ -2,6 +2,13 @@ namespace CivitaiFirehose;
 
 public class HydrusClient(HttpClient client, ILogger<HydrusClient> logger)
 {
+    public async Task VerifyAccess()
+    {
+        var response = await client.GetAsync("verify_access_key");
+        
+        response.EnsureSuccessStatusCode();
+    }
+    
     private record ImportImageRequest(string Path);
     public async Task SendImageToHydrus(string path)
     {
