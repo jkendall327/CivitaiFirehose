@@ -2,10 +2,10 @@ using Microsoft.Extensions.Options;
 
 namespace CivitaiFirehose;
 
-public class ImageBackgroundService(
-    IImageService imageService,
+public class CivitaiPollingBackgroundService(
+    ICivitaiPoller civitaiPoller,
     IOptions<CivitaiSettings> options,
-    ILogger<ImageBackgroundService> logger) : BackgroundService
+    ILogger<CivitaiPollingBackgroundService> logger) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken ct)
     {
@@ -20,7 +20,7 @@ public class ImageBackgroundService(
             while (await timer.WaitForNextTickAsync(ct))
             {
                 logger.LogInformation("Timer elapsed, polling Civitai");
-                await imageService.PollCivitai(ct);
+                await civitaiPoller.PollCivitai(ct);
             }
         }
         catch (OperationCanceledException)

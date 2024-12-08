@@ -1,13 +1,13 @@
 namespace CivitaiFirehose;
 
-public interface IImageService
+public interface ICivitaiPoller
 {
     Task PollCivitai(CancellationToken ct);
     Func<int, Task>? NewImagesFound { get; set; }
     List<ImageModel> GetImages();
 }
 
-public class CivitaiImageService(CivitaiClient client, ILogger<CivitaiImageService> logger) : IImageService
+public class CivitaiPoller(CivitaiClient client, ILogger<CivitaiPoller> logger) : ICivitaiPoller
 {
     private readonly Stack<ImageModel> _images = new(20);
 

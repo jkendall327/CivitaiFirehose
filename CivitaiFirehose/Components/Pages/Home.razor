@@ -1,7 +1,7 @@
 ﻿@page "/"
 @implements IDisposable
 @rendermode InteractiveServer
-@inject IImageService ImageService
+@inject ICivitaiPoller CivitaiPoller
 @inject JsService JsService
 @inject ILogger<Home> Logger
 
@@ -19,7 +19,7 @@
                 <a href="@image.PostUrl">
                     <img src="@image.ImageUrl" alt="Grid Item">
                 </a>
-                <button class="overlay-button" @onclick="() => OnButtonClick(image)">
+                <button class="overlay-button" @onclick="() => OnImageButtonClick(image)">
                     ⭐
                 </button>
             </div>
@@ -97,8 +97,8 @@
     
     protected override void OnInitialized()
     {
-        _images = ImageService.GetImages();
-        ImageService.NewImagesFound += SetImages;
+        _images = CivitaiPoller.GetImages();
+        CivitaiPoller.NewImagesFound += SetImages;
     }
     
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -112,7 +112,7 @@
     private async Task SetImages(int newCount)
     {
         await InvokeAsync(async () => {
-            _images = ImageService.GetImages();
+            _images = CivitaiPoller.GetImages();
             
             Logger.LogInformation("Got {ImageCount} new images from service, updating UI", newCount);
 
@@ -135,11 +135,11 @@
 
     public void Dispose()
     {
-        ImageService.NewImagesFound -= SetImages;
+        CivitaiPoller.NewImagesFound -= SetImages;
         JsService.Dispose();
     }
 
-    private Task OnButtonClick(ImageModel image)
+    private Task OnImageButtonClick(ImageModel image)
     {
         Logger.LogInformation("Clicked {ImageUrl}", image.ImageUrl);
         return Task.CompletedTask;
