@@ -17,7 +17,7 @@ public record Items(
     string createdAt,
     int postId,
     Stats stats,
-    Meta meta,
+    Meta? meta,
     string username,
     string baseModel
 );

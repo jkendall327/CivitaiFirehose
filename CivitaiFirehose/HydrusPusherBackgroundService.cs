@@ -25,7 +25,7 @@ public class HydrusPusherBackgroundService(
 
             var service = services["my tags"];
             
-            await client.AddTagsToImage(hash, ["civitai"], service);
+            await client.AddTagsToImage(hash, image.Tags, service);
         }
     }
 }

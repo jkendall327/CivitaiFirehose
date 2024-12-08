@@ -61,12 +61,15 @@ public class CivitaiPoller(CivitaiClient client, ILogger<CivitaiPoller> logger) 
     {
         var tags = new HashSet<string>
         {
-            $"id:{item.id}",
+            "source:civitai-firehose",
+            $"image id:{item.id}",
+            $"post id:{item.postId}",
             $"nsfw level:{item.nsfwLevel}",
-            $"browsing level:{item.browsingLevel}",
             $"username:{item.username}",
             $"base model:{item.baseModel}"
         };
+        
+        if (item.meta is null) return tags.ToList();
 
         if (!string.IsNullOrWhiteSpace(item.meta.prompt))
         {
