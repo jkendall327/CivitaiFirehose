@@ -10,14 +10,22 @@
 </HeadContent>
 
 <div class="grid-container">
+@if (_images.Count > 0)
+{
     @foreach (var image in _images)
     {
         <div class="grid-item">
-            <a href="@image.PostUrl">
-                <img src="@image.ImageUrl" alt="Grid Item">
-            </a>
+            <div class="image-container">
+                <a href="@image.PostUrl">
+                    <img src="@image.ImageUrl" alt="Grid Item">
+                </a>
+                <button class="overlay-button" @onclick="() => OnButtonClick(image)">
+                    ⭐
+                </button>
+            </div>
         </div>
     }
+}
 </div>
 
 <style>
@@ -36,11 +44,49 @@
         overflow: hidden;
     }
 
-    .grid-item img {
+    .image-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+
+    .image-container img {
         width: 100%;
         height: 100%;
         object-fit: cover;
         display: block;
+    }
+
+    .overlay-button {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transform: scale(1);
+        transition: transform 0.1s ease, background-color 0.2s;
+    }
+
+    .overlay-button:hover {
+        background-color: rgba(0, 0, 0, 0.8);
+    }
+
+    .overlay-button:active {
+        transform: scale(0.9);
+    }
+
+    @@keyframes click-pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(0.9); }
+        100% { transform: scale(1); }
     }
 </style>
 
@@ -91,5 +137,11 @@
     {
         ImageService.NewImagesFound -= SetImages;
         JsService.Dispose();
+    }
+
+    private Task OnButtonClick(ImageModel image)
+    {
+        Logger.LogInformation("Clicked {ImageUrl}", image.ImageUrl);
+        return Task.CompletedTask;
     }
 }
