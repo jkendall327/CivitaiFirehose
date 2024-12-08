@@ -54,11 +54,34 @@
     private List<ImageModel> _images = [];
 
     public string PageTitle { get; set; } = "Civitai Firehose";
+    private DotNetObjectReference<Home>? _dotNetReference;
     
     protected override void OnInitialized()
     {
         _images = ImageService.GetImages();
         ImageService.NewImagesFound += SetImages;
+    }
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _dotNetReference = DotNetObjectReference.Create(this);
+            
+            await JS.InvokeVoidAsync("eval", @"
+            window.tabVisibilityHandler = {
+                initialize: function (dotNetReference) {
+                    document.addEventListener('visibilitychange', function () {
+                        if (document.visibilityState === 'visible') {
+                            dotNetReference.invokeMethodAsync('OnTabFocused');
+                        }
+                    });
+                }
+            };
+        ");
+            
+            await JS.InvokeVoidAsync("tabVisibilityHandler.initialize", _dotNetReference);
+        }
     }
 
     private async Task SetImages(int newCount)
@@ -74,6 +97,20 @@
             StateHasChanged();
         });
     }
+    
+    [JSInvokable]
+    public async Task OnTabFocused()
+    {
+        Logger.LogDebug("Tab focused, clearing any unread notifications");
+        
+        PageTitle = "Civitai Firehose";
+        
+        await JS.InvokeVoidAsync("eval", $"document.title = '{PageTitle}'");
+    }
 
-    public void Dispose() => ImageService.NewImagesFound -= SetImages;
+    public void Dispose()
+    {
+        ImageService.NewImagesFound -= SetImages;
+        _dotNetReference?.Dispose();
+    }
 }
