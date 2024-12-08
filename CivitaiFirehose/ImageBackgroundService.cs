@@ -1,18 +1,7 @@
 namespace CivitaiFirehose;
 
-public class ImageBackgroundService : BackgroundService
+public class ImageBackgroundService(IImageService imageService, ILogger<ImageBackgroundService> logger) : BackgroundService
 {
-    readonly IImageService _imageService;
-    readonly ILogger<ImageBackgroundService> _logger;
-
-    public ImageBackgroundService(
-        IImageService imageService,
-        ILogger<ImageBackgroundService> logger)
-    {
-        _imageService = imageService;
-        _logger = logger;
-    }
-
     protected override async Task ExecuteAsync(CancellationToken ct)
     {
         try
@@ -20,11 +9,14 @@ public class ImageBackgroundService : BackgroundService
             using var timer = new PeriodicTimer(TimeSpan.FromSeconds(5));
             
             while (await timer.WaitForNextTickAsync(ct))
-                await _imageService.PollCivitai(ct);
+            {
+                logger.LogInformation("Timer elapsed, polling Civitai");
+                await imageService.PollCivitai(ct);
+            }
         }
         catch (OperationCanceledException)
         {
-            _logger.LogInformation("Image monitoring stopped");
+            logger.LogInformation("Image monitoring stopped");
         }
     }
 }

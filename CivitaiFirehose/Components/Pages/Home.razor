@@ -46,29 +46,22 @@
 </style>
 
 @code {
-    private List<ImageModel> _images = new();
+    private List<ImageModel> _images = [];
     
     protected override void OnInitialized()
     {
-        Logger.LogInformation("Entered OnInitialized");
         _images = ImageService.GetImages();
         ImageService.NewImagesFound += SetImages;
     }
 
     private async Task SetImages()
     {
-        Logger.LogInformation("Just entered SetImages");
-        
         await InvokeAsync(() => {
             _images = ImageService.GetImages();
-            Logger.LogInformation("Just set images");
+            Logger.LogInformation("Got {ImageCount} images from service, updating UI", _images.Count);
             StateHasChanged();
         });
     }
 
-    public void Dispose()
-    {
-        Logger.LogInformation("Disposing Home");
-        ImageService.NewImagesFound -= SetImages;
-    }
+    public void Dispose() => ImageService.NewImagesFound -= SetImages;
 }

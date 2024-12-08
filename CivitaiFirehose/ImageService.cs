@@ -7,7 +7,7 @@ public interface IImageService
     List<ImageModel> GetImages();
 }
 
-public class CivitAiImageService(CivitaiClient client, ILogger<CivitAiImageService> logger) : IImageService
+public class CivitaiImageService(CivitaiClient client, ILogger<CivitaiImageService> logger) : IImageService
 {
     private readonly HashSet<string> _seenUrls = new();
     private readonly Stack<ImageModel> _images = new(20);
@@ -16,24 +16,7 @@ public class CivitAiImageService(CivitaiClient client, ILogger<CivitAiImageServi
     {
         try
         {
-            var response = await client.GetImages(ct);
-
-            var any = false;
-            
-            foreach (var img in response.items)
-            {
-                if (_seenUrls.Add(img.url)) // Only process new images
-                {
-                    any = true;
-                    _images.Push(new(img.url, $"https://civitai.com/images/{img.postId.ToString()}"));
-                }
-            }
-
-            if (any)
-            {
-                var t = NewImagesFound?.Invoke();
-                if (t != null) await t;
-            }
+            await PollCore(ct);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
@@ -41,10 +24,35 @@ public class CivitAiImageService(CivitaiClient client, ILogger<CivitAiImageServi
         }
     }
 
-    public List<ImageModel> GetImages()
+    private async Task PollCore(CancellationToken ct)
     {
-        return _images.ToList();
+        var response = await client.GetImages(ct);
+
+        var found = 0;
+            
+        foreach (var img in response.items)
+        {
+            // Only process new images.
+            if (!_seenUrls.Add(img.url)) continue;
+                
+            found++;
+                    
+            var postUrl = $"https://civitai.com/posts/{img.postId.ToString()}";
+                    
+            _images.Push(new(img.url, postUrl));
+        }
+            
+        if (found > 0)
+        {
+            logger.LogInformation("Found {NewImages} new images", found);
+                
+            // Tell the UI we have new images.
+            var t = NewImagesFound?.Invoke();
+            if (t != null) await t;
+        }
     }
-    
+
+    public List<ImageModel> GetImages() => _images.ToList();
+
     public Func<Task>? NewImagesFound { get; set; }
 }
