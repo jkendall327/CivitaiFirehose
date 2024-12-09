@@ -107,6 +107,8 @@
     private List<ImageModel> _images = [];
 
     public string PageTitle { get; set; } = "Civitai Firehose";
+
+    public int Unseen { get; set; }
     
     protected override void OnInitialized()
     {
@@ -129,7 +131,8 @@
             
             Logger.LogInformation("Got {ImageCount} new images from service, updating UI", newCount);
 
-            PageTitle = $"Civitai Firehose ({newCount})";
+            Unseen += newCount;
+            PageTitle = $"Civitai Firehose ({Unseen})";
             await JsService.SetTabTitle(PageTitle);
 
             StateHasChanged();
@@ -140,6 +143,8 @@
     public async Task OnTabFocused()
     {
         Logger.LogDebug("Tab focused, clearing any unread notifications");
+
+        Unseen = 0;
         
         PageTitle = "Civitai Firehose";
 
