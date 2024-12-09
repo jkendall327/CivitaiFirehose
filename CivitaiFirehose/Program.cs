@@ -1,5 +1,6 @@
 using CivitaiFirehose;
 using CivitaiFirehose.Components;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,6 +8,16 @@ builder.Host.UseDefaultServiceProvider((context, options) => {
     options.ValidateScopes = true;
     options.ValidateOnBuild = true;
 });
+
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File("logs/civitai-firehose-.txt",
+        rollingInterval: RollingInterval.Day,
+        retainedFileCountLimit: 7,
+        fileSizeLimitBytes: 5 * 1024 * 1024) // 5MB per file
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
