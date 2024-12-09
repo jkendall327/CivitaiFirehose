@@ -1,3 +1,4 @@
+using System.Net;
 using Microsoft.Extensions.Options;
 
 namespace CivitaiFirehose;
@@ -23,7 +24,17 @@ public class CivitaiPollingBackgroundService(
             while (await timer.WaitForNextTickAsync(ct))
             {
                 logger.LogInformation("Timer elapsed, polling Civitai");
-                await civitaiPoller.PollCivitai(ct);
+
+                try
+                {
+                    await civitaiPoller.PollCivitai(ct);
+                }
+                catch (HttpRequestException e) when (e.StatusCode == HttpStatusCode.ServiceUnavailable)
+                {
+                    logger.LogWarning("Civitai is currently unavailable, waiting...");
+                    await Task.Delay(TimeSpan.FromMinutes(5), ct);
+                    logger.LogInformation("Wait elapsed; trying to poll Civitai again");
+                }
             }
         }
         catch (OperationCanceledException)
