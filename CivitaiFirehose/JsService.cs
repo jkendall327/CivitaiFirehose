@@ -3,7 +3,7 @@ using Microsoft.JSInterop;
 
 namespace CivitaiFirehose;
 
-public class JsService(IJSRuntime js) : IDisposable
+public sealed class JsService(IJSRuntime js) : IDisposable
 {
     private DotNetObjectReference<Home>? _dotNetReference;
 

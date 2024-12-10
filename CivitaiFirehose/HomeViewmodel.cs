@@ -91,7 +91,7 @@ public sealed class HomeViewmodel(
             ImagePushStatus.Failed => "\u274c",
             // ✓
             ImagePushStatus.Succeeded => "\u2713",
-            _ => throw new ArgumentOutOfRangeException()
+            var _ => throw new ArgumentOutOfRangeException(nameof(image))
         };
     }
 
