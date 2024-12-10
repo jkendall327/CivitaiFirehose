@@ -63,6 +63,9 @@ public record Meta(
 {
     [JsonIgnore]
     public int width { get; init; } = width;
+
+    [JsonIgnore]
+    public int height { get; init; } = height;
 }
 
 public record Hashes(
