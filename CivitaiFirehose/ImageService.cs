@@ -5,15 +5,15 @@ namespace CivitaiFirehose;
 public interface ICivitaiPoller
 {
     Task PollCivitai(CancellationToken ct);
+    Stack<ImageModel> Images { get; }
     Func<int, Task>? NewImagesFound { get; set; }
-    List<ImageModel> GetImages();
     void BlacklistUser(string username);
     Task<List<ImageModel>> GetAllImagesFromPost(int postId, CancellationToken ct = default);
 }
 
 public class CivitaiPoller(CivitaiClient client, IOptions<CivitaiSettings> options, ILogger<CivitaiPoller> logger) : ICivitaiPoller
 {
-    private readonly Stack<ImageModel> _images = new(options.Value.QueryDefaults.Limit ?? 20);
+    public Stack<ImageModel> Images { get; } = new(options.Value.QueryDefaults.Limit ?? 20);
     private readonly HashSet<string> _blacklistedUsers = new();
 
     public async Task PollCivitai(CancellationToken ct)
@@ -41,7 +41,7 @@ public class CivitaiPoller(CivitaiClient client, IOptions<CivitaiSettings> optio
 
         foreach (var img in response.items)
         {
-            if (_images.Any(s => s.ImageUrl == img.url))
+            if (Images.Any(s => s.ImageUrl == img.url))
             {
                 continue;
             }
@@ -57,7 +57,7 @@ public class CivitaiPoller(CivitaiClient client, IOptions<CivitaiSettings> optio
 
             found++;
 
-            _images.Push(image);
+            Images.Push(image);
         }
 
         if (found > 0)
@@ -87,7 +87,7 @@ public class CivitaiPoller(CivitaiClient client, IOptions<CivitaiSettings> optio
         return images.ToList();
     }
     
-    public List<ImageModel> GetImages() => _images.ToList();
+    public List<ImageModel> GetImages() => Images.ToList();
 
     public Func<int, Task>? NewImagesFound { get; set; }
 }

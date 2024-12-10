@@ -10,15 +10,13 @@ public sealed class HomeViewmodel(
     ChannelWriter<ImageModel> writer,
     ILogger<HomeViewmodel> logger) : IDisposable
 {
-    public List<ImageModel> Images { get; private set; } = [];
+    public Stack<ImageModel> Images => civitaiPoller.Images;
     public string PageTitle { get; private set; } = "Civitai Firehose";
     private int Unseen { get; set; }
     public event Func<Task>? StateUpdated;
 
     public void OnInitialized()
     {
-        Images = civitaiPoller.GetImages();
-
         civitaiPoller.NewImagesFound += SetImages;
         pusher.OnStateChanged += NotifyStateChanged;
     }
@@ -33,10 +31,7 @@ public sealed class HomeViewmodel(
 
     private async Task SetImages(int newCount)
     {
-        Images = civitaiPoller.GetImages();
-
         logger.LogInformation("Got {ImageCount} new images from service, updating UI", newCount);
-
         Unseen += newCount;
         PageTitle = $"Civitai Firehose ({Unseen})";
         await jsService.SetTabTitle(PageTitle);
