@@ -10,7 +10,7 @@ public sealed class HomeViewmodel(
     ChannelWriter<ImageModel> writer,
     ILogger<HomeViewmodel> logger) : IDisposable
 {
-    public BoundedQueue<ImageModel> Images => civitaiPoller.Images;
+    public IEnumerable<ImageModel> Images => civitaiPoller.Images.Reverse();
     public string PageTitle { get; private set; } = "Civitai Firehose";
     private int Unseen { get; set; }
     public event Func<Task>? StateUpdated;
