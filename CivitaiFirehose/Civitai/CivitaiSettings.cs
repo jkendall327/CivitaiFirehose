@@ -5,8 +5,9 @@ namespace CivitaiFirehose;
 
 public class CivitaiSettings
 {
-    public TimeSpan PollingPeriod { get; set; }
-    public CivitaiImageQuery QueryDefaults { get; set; } = new();
+    public TimeSpan PollingPeriod { get; init; }
+    public List<string> ExcludedCreators { get; set; } = [];
+    public CivitaiImageQuery QueryDefaults { get; init; } = new();
 }
 
 public enum NsfwFilter

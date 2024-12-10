@@ -14,7 +14,7 @@ public interface ICivitaiPoller
 public class CivitaiPoller(CivitaiClient client, IOptions<CivitaiSettings> options, ILogger<CivitaiPoller> logger) : ICivitaiPoller
 {
     public Stack<ImageModel> Images { get; } = new(options.Value.QueryDefaults.Limit ?? 20);
-    private readonly HashSet<string> _blacklistedUsers = new();
+    private readonly HashSet<string> _blacklistedUsers = [..options.Value.ExcludedCreators];
 
     public async Task PollCivitai(CancellationToken ct)
     {
