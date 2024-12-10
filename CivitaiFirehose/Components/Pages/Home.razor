@@ -5,6 +5,7 @@
 
 <HeadContent>
     <PageTitle>@Viewmodel.PageTitle</PageTitle>
+    <link href="home.css" rel="stylesheet"/>
 </HeadContent>
 
 <div class="grid-container">
@@ -28,95 +29,6 @@
         </div>
     }
 </div>
-
-<style>
-    .grid-container {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        grid-template-rows: repeat(6, 1fr);
-        gap: 15px;
-        margin: 0 auto;
-        padding: 20px;
-    }
-
-    .grid-item {
-        width: 100%;
-        aspect-ratio: 1;
-    }
-
-    .image-container {
-        position: relative;
-        width: 100%;
-        height: 100%;
-        z-index: 1;
-    }
-
-    .image-container:hover {
-        z-index: 2;
-    }
-
-    .image-container img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-        transition: transform 0.3s ease;
-    }
-
-    .image-container:hover img {
-        transform: scale(1.025);
-    }
-
-    .overlay-button {
-        position: absolute;
-        background-color: rgba(0, 0, 0, 0.5);
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 32px;
-        height: 32px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transform: scale(1);
-        opacity: 0;
-        transition: opacity 0.2s ease, transform 0.1s ease, background-color 0.2s;
-    }
-    
-    .star-button {
-        bottom: 10px;
-        left: 10px;
-    }
-    
-    .download-all-button {
-        bottom: 10px;
-        left: 50px;
-    }
-
-    .blacklist-button {
-        top: 10px;
-        left: 10px;
-    }
-
-    .image-container:hover .overlay-button {
-        opacity: 1;
-    }
-
-    .overlay-button:hover {
-        background-color: rgba(0, 0, 0, 0.8);
-    }
-
-    .overlay-button:active {
-        transform: scale(0.9);
-    }
-
-    @@keyframes click-pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(0.9); }
-        100% { transform: scale(1); }
-    }
-</style>
 
 @code {
     public string GetDownloadStatusIcon(ImageModel image) => Viewmodel.GetDownloadStatusIcon(image);
