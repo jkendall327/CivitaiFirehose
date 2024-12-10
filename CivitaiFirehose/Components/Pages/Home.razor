@@ -4,6 +4,7 @@
 @rendermode InteractiveServer
 @inject ICivitaiPoller CivitaiPoller
 @inject ChannelWriter<ImageModel> Writer
+@inject HydrusPusher Pusher
 @inject JsService JsService
 @inject ILogger<Home> Logger
 
@@ -140,9 +141,16 @@
     protected override void OnInitialized()
     {
         _images = CivitaiPoller.GetImages();
+        
         CivitaiPoller.NewImagesFound += SetImages;
+        Pusher.OnStateChanged += OnImageStateChanged;
     }
-    
+
+    private async Task OnImageStateChanged()
+    {
+        await InvokeAsync(StateHasChanged);
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -197,6 +205,7 @@
     public void Dispose()
     {
         CivitaiPoller.NewImagesFound -= SetImages;
+        Pusher.OnStateChanged -= OnImageStateChanged;
         JsService.Dispose();
     }
 }
