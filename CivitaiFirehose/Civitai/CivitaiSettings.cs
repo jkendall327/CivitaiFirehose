@@ -109,4 +109,20 @@ public class CivitaiImageQuery
         
         return dict;
     }
+
+    public CivitaiImageQuery Clone()
+    {
+        return new()
+        {
+            Limit = Limit,
+            PostId = PostId,
+            ModelId = ModelId,
+            ModelVersionId = ModelVersionId,
+            Username = Username,
+            Nsfw = Nsfw,
+            Sort = Sort,
+            Period = Period,
+            Page = Page,
+        };
+    }
 }

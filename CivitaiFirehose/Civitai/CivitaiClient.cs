@@ -25,7 +25,7 @@ public class CivitaiClient(HttpClient client, IOptionsMonitor<CivitaiSettings> o
     
     public async Task<CivitaiResponse> GetImagesFromPost(int postId, CancellationToken cancellationToken = default)
     {
-        var query = options.CurrentValue.QueryDefaults;
+        var query = options.CurrentValue.QueryDefaults.Clone();
 
         // Maximum to ensure we get all images.
         query.Limit = 100;
