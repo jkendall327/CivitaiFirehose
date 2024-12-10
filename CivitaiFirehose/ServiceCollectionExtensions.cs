@@ -18,6 +18,8 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ICivitaiPoller, CivitaiPoller>();
         services.AddHostedService<CivitaiPollingBackgroundService>();
 
+        services.AddScoped<HomeViewmodel>();
+        
         return services;
     }
 
