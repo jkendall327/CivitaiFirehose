@@ -170,7 +170,7 @@
     
     private async Task OnDownloadAllClick(ImageModel image)
     {
-        var images = await CivitaiPoller.GetAllImagesFromPost(0);
+        var images = await CivitaiPoller.GetAllImagesFromPost(image.PostId);
 
         foreach (var imageModel in images)
         {

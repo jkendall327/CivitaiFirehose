@@ -41,7 +41,7 @@ public class CivitaiPoller(CivitaiClient client, ILogger<CivitaiPoller> logger) 
 
             var tags = TagExtractor.GetTagsFromResponse(img);
             
-            var image = new ImageModel(img.url, postUrl, tags);
+            var image = new ImageModel(img.url, img.postId, tags);
 
             found++;
 
@@ -67,9 +67,7 @@ public class CivitaiPoller(CivitaiClient client, ILogger<CivitaiPoller> logger) 
         {
             var tags = TagExtractor.GetTagsFromResponse(s);
             
-            var postUrl = $"https://civitai.com/posts/{s.postId.ToString()}";
-
-            var image = new ImageModel(s.url, postUrl, tags);
+            var image = new ImageModel(s.url, s.postId, tags);
 
             return image;
         });
