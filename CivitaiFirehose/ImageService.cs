@@ -7,12 +7,14 @@ public interface ICivitaiPoller
     Task PollCivitai(CancellationToken ct);
     Func<int, Task>? NewImagesFound { get; set; }
     List<ImageModel> GetImages();
+    void BlacklistUser(string username);
     Task<List<ImageModel>> GetAllImagesFromPost(int postId, CancellationToken ct = default);
 }
 
 public class CivitaiPoller(CivitaiClient client, IOptions<CivitaiSettings> options, ILogger<CivitaiPoller> logger) : ICivitaiPoller
 {
     private readonly Stack<ImageModel> _images = new(options.Value.QueryDefaults.Limit ?? 20);
+    private readonly HashSet<string> _blacklistedUsers = new();
 
     public async Task PollCivitai(CancellationToken ct)
     {
@@ -24,6 +26,11 @@ public class CivitaiPoller(CivitaiClient client, IOptions<CivitaiSettings> optio
         {
             logger.LogError(ex, "Failed to poll for new images");
         }
+    }
+
+    public void BlacklistUser(string username)
+    {
+        _blacklistedUsers.Add(username);
     }
 
     private async Task PollCore(CancellationToken ct)
@@ -38,10 +45,15 @@ public class CivitaiPoller(CivitaiClient client, IOptions<CivitaiSettings> optio
             {
                 continue;
             }
+
+            if (_blacklistedUsers.Contains(img.username))
+            {
+                continue;
+            }
             
             var tags = TagExtractor.GetTagsFromResponse(img);
             
-            var image = new ImageModel(img.url, img.postId, tags);
+            var image = new ImageModel(img.url, img.postId, img.username, tags);
 
             found++;
 
@@ -67,7 +79,7 @@ public class CivitaiPoller(CivitaiClient client, IOptions<CivitaiSettings> optio
         {
             var tags = TagExtractor.GetTagsFromResponse(s);
             
-            var image = new ImageModel(s.url, s.postId, tags);
+            var image = new ImageModel(s.url, s.postId, s.username, tags);
 
             return image;
         });

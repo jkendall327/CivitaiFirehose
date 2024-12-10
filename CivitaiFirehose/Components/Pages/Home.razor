@@ -26,6 +26,9 @@
                 <button class="overlay-button download-all-button" @onclick="() => OnDownloadAllClick(image)">
                     ⬇️
                 </button>
+                <button class="overlay-button blacklist-button" @onclick="() => OnBlacklistUser(image)">
+                    ❌
+                </button>
             </div>
         </div>
     }
@@ -94,6 +97,11 @@
     .download-all-button {
         bottom: 10px;
         left: 50px;
+    }
+
+    .blacklist-button {
+        top: 10px;
+        left: 10px;
     }
 
     .image-container:hover .overlay-button {
@@ -186,6 +194,7 @@
         await JsService.SetTabTitle(PageTitle);
     }
     
+    // TODO: proper MVVM etc. for this page, getting too big.
     private async Task OnImageButtonClick(ImageModel image)
     {
         Logger.LogInformation("Sending {ImageUrl} to Hydrus service", image.ImageUrl);
@@ -200,6 +209,12 @@
         {
             await Writer.WriteAsync(imageModel);
         }
+    }
+    
+    private Task OnBlacklistUser(ImageModel image)
+    {
+        CivitaiPoller.BlacklistUser(image.Username);
+        return Task.CompletedTask;
     }
 
     public void Dispose()
