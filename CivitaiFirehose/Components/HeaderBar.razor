@@ -1,0 +1,93 @@
+@namespace CivitaiFirehose.Components.Layout
+
+<header class="header">
+    <div class="header-content">
+        <div class="search-container">
+            <input type="text" placeholder="Search..." class="search-input" />
+            <button class="search-button">Search</button>
+        </div>
+        <div class="header-buttons">
+            <button class="header-button">Settings</button>
+            <button class="header-button">Help</button>
+        </div>
+    </div>
+</header>
+
+<style>
+    .header {
+        background-color: #1a1a1a;
+        border-bottom: 1px solid #333;
+        max-height: 60px;
+        padding: 0.35rem;
+        width: 100%;
+    }
+
+    .header-content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        max-width: 1200px;
+        margin: 0 auto;
+        position: relative;
+    }
+
+    .search-container {
+        display: flex;
+        gap: 0.25rem;
+        width: 400px;
+    }
+
+    .search-input {
+        flex: 1;
+        padding: 0.25rem 0.5rem;
+        border: none;
+        border-radius: 3px;
+        font-size: 0.9rem;
+        height: 1.8rem;
+        background-color: #333;
+        color: white;
+    }
+
+    .search-input::placeholder {
+        color: #999;
+    }
+
+    .search-button {
+        padding: 0.25rem 0.75rem;
+        height: 1.8rem;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        background-color: #0d6efd;
+        color: white;
+    }
+
+    .header-buttons {
+        position: absolute;
+        right: 0;
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .header-button {
+        padding: 0.25rem 0.75rem;
+        height: 1.8rem;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        background-color: #444;
+        color: white;
+    }
+
+    .header-button:hover, .search-button:hover {
+        filter: brightness(1.1);
+    }
+
+    .search-input:focus {
+        outline: none;
+        background-color: #404040;
+    }
+</style>
