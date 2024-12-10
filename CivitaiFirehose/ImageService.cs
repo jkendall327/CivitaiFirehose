@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Options;
+
 namespace CivitaiFirehose;
 
 public interface ICivitaiPoller
@@ -8,9 +10,9 @@ public interface ICivitaiPoller
     Task<List<ImageModel>> GetAllImagesFromPost(int postId, CancellationToken ct = default);
 }
 
-public class CivitaiPoller(CivitaiClient client, ILogger<CivitaiPoller> logger) : ICivitaiPoller
+public class CivitaiPoller(CivitaiClient client, IOptions<CivitaiSettings> options, ILogger<CivitaiPoller> logger) : ICivitaiPoller
 {
-    private readonly Stack<ImageModel> _images = new(20);
+    private readonly Stack<ImageModel> _images = new(options.Value.QueryDefaults.Limit ?? 20);
 
     public async Task PollCivitai(CancellationToken ct)
     {
@@ -37,8 +39,6 @@ public class CivitaiPoller(CivitaiClient client, ILogger<CivitaiPoller> logger) 
                 continue;
             }
             
-            var postUrl = $"https://civitai.com/posts/{img.postId.ToString()}";
-
             var tags = TagExtractor.GetTagsFromResponse(img);
             
             var image = new ImageModel(img.url, img.postId, tags);
