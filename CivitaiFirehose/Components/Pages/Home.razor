@@ -20,7 +20,7 @@
                     <img src="@image.ImageUrl" alt="Grid Item">
                 </a>
                 <button class="overlay-button star-button" @onclick="() => OnImageButtonClick(image)">
-                    ⭐
+                    @GetDownloadStatusIcon(image)
                 </button>
                 <button class="overlay-button download-all-button" @onclick="() => OnDownloadAllClick(image)">
                     ⬇️
@@ -120,6 +120,22 @@
     public string PageTitle { get; set; } = "Civitai Firehose";
 
     public int Unseen { get; set; }
+
+    public string GetDownloadStatusIcon(ImageModel image)
+    {
+        return image.PushStatus switch
+        {
+            // ⭐
+            ImagePushStatus.NotPushed => "\u2b50",
+            // ⏳
+            ImagePushStatus.Pushing => "\u23f3",
+            // ❌
+            ImagePushStatus.Failed => "\u274c",
+            // ✓
+            ImagePushStatus.Succeeded => "\u2713",
+            _ => throw new ArgumentOutOfRangeException()
+        };
+    }
     
     protected override void OnInitialized()
     {
