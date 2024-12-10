@@ -5,6 +5,7 @@ public interface ICivitaiPoller
     Task PollCivitai(CancellationToken ct);
     Func<int, Task>? NewImagesFound { get; set; }
     List<ImageModel> GetImages();
+    Task<List<ImageModel>> GetAllImagesFromPost(int postId, CancellationToken ct = default);
 }
 
 public class CivitaiPoller(CivitaiClient client, ILogger<CivitaiPoller> logger) : ICivitaiPoller
@@ -55,6 +56,25 @@ public class CivitaiPoller(CivitaiClient client, ILogger<CivitaiPoller> logger) 
             var t = NewImagesFound?.Invoke(found);
             if (t != null) await t;
         }
+    }
+
+    public async Task<List<ImageModel>> GetAllImagesFromPost(int postId, CancellationToken ct = default)
+    {
+        var response = await client.GetImagesFromPost(postId, ct);
+        
+        // TODO: factor out repeated code.
+        var images = response.items.Select(s =>
+        {
+            var tags = TagExtractor.GetTagsFromResponse(s);
+            
+            var postUrl = $"https://civitai.com/posts/{s.postId.ToString()}";
+
+            var image = new ImageModel(s.url, postUrl, tags);
+
+            return image;
+        });
+
+        return images.ToList();
     }
     
     public List<ImageModel> GetImages() => _images.ToList();

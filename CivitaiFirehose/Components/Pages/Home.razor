@@ -19,8 +19,11 @@
                 <a href="@image.PostUrl" target="_blank">
                     <img src="@image.ImageUrl" alt="Grid Item">
                 </a>
-                <button class="overlay-button" @onclick="() => OnImageButtonClick(image)">
+                <button class="overlay-button star-button" @onclick="() => OnImageButtonClick(image)">
                     ⭐
+                </button>
+                <button class="overlay-button download-all-button" @onclick="() => OnDownloadAllClick(image)">
+                    ⬇️
                 </button>
             </div>
         </div>
@@ -67,8 +70,6 @@
 
     .overlay-button {
         position: absolute;
-        bottom: 10px;
-        left: 10px;
         background-color: rgba(0, 0, 0, 0.5);
         color: white;
         border: none;
@@ -82,6 +83,16 @@
         transform: scale(1);
         opacity: 0;
         transition: opacity 0.2s ease, transform 0.1s ease, background-color 0.2s;
+    }
+    
+    .star-button {
+        bottom: 10px;
+        left: 10px;
+    }
+    
+    .download-all-button {
+        bottom: 10px;
+        left: 50px;
     }
 
     .image-container:hover .overlay-button {
@@ -155,6 +166,16 @@
     {
         Logger.LogInformation("Sending {ImageUrl} to Hydrus service", image.ImageUrl);
         await Writer.WriteAsync(image);
+    }
+    
+    private async Task OnDownloadAllClick(ImageModel image)
+    {
+        var images = await CivitaiPoller.GetAllImagesFromPost(0);
+
+        foreach (var imageModel in images)
+        {
+            await Writer.WriteAsync(imageModel);
+        }
     }
 
     public void Dispose()
