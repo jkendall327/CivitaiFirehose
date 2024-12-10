@@ -31,6 +31,8 @@ public static class ServiceCollectionExtensions
             c.BaseAddress = new(opt.BaseUrl);
             c.DefaultRequestHeaders.Add("Hydrus-Client-API-Access-Key", opt.ApiKey);
         });
+
+        services.AddSingleton<HydrusPusher>();
         services.AddHostedService<HydrusPusherBackgroundService>();
 
         return services;
