@@ -1,19 +1,14 @@
 ﻿@page "/"
-@using System.Threading.Channels
 @implements IDisposable
 @rendermode InteractiveServer
-@inject ICivitaiPoller CivitaiPoller
-@inject ChannelWriter<ImageModel> Writer
-@inject HydrusPusher Pusher
-@inject JsService JsService
-@inject ILogger<Home> Logger
+@inject HomeViewmodel Viewmodel
 
 <HeadContent>
-    <PageTitle>@PageTitle</PageTitle>
+    <PageTitle>@Viewmodel.PageTitle</PageTitle>
 </HeadContent>
 
 <div class="grid-container">
-    @foreach (var image in _images)
+    @foreach (var image in Viewmodel.Images)
     {
         <div class="grid-item">
             <div class="image-container">
@@ -124,103 +119,26 @@
 </style>
 
 @code {
-    private List<ImageModel> _images = [];
+    public string GetDownloadStatusIcon(ImageModel image) => Viewmodel.GetDownloadStatusIcon(image);
 
-    public string PageTitle { get; set; } = "Civitai Firehose";
-
-    public int Unseen { get; set; }
-
-    public string GetDownloadStatusIcon(ImageModel image)
-    {
-        return image.PushStatus switch
-        {
-            // ⭐
-            ImagePushStatus.NotPushed => "\u2b50",
-            // ⏳
-            ImagePushStatus.Pushing => "\u23f3",
-            // ❌
-            ImagePushStatus.Failed => "\u274c",
-            // ✓
-            ImagePushStatus.Succeeded => "\u2713",
-            _ => throw new ArgumentOutOfRangeException()
-        };
-    }
-    
     protected override void OnInitialized()
     {
-        _images = CivitaiPoller.GetImages();
-        
-        CivitaiPoller.NewImagesFound += SetImages;
-        Pusher.OnStateChanged += OnImageStateChanged;
-    }
-
-    private async Task OnImageStateChanged()
-    {
-        await InvokeAsync(StateHasChanged);
+        Viewmodel.OnInitialized();
+        Viewmodel.StateUpdated += async () => await InvokeAsync(StateHasChanged);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
-        {
-            await JsService.Initialise(this);
-        }
-    }
-
-    private async Task SetImages(int newCount)
-    {
-        await InvokeAsync(async () => {
-            _images = CivitaiPoller.GetImages();
-            
-            Logger.LogInformation("Got {ImageCount} new images from service, updating UI", newCount);
-
-            Unseen += newCount;
-            PageTitle = $"Civitai Firehose ({Unseen})";
-            await JsService.SetTabTitle(PageTitle);
-
-            StateHasChanged();
-        });
+        if (!firstRender) return;
+        await Viewmodel.OnAfterRenderAsync(this);
     }
     
     [JSInvokable]
-    public async Task OnTabFocused()
-    {
-        Logger.LogDebug("Tab focused, clearing any unread notifications");
+    public async Task OnTabFocused() => await Viewmodel.OnTabFocused();
 
-        Unseen = 0;
-        
-        PageTitle = "Civitai Firehose";
+    private async Task OnImageButtonClick(ImageModel image) => await Viewmodel.OnImageButtonClick(image);
+    private async Task OnDownloadAllClick(ImageModel image) => await Viewmodel.OnDownloadAllClick(image);
+    private async Task OnBlacklistUser(ImageModel image) => await Viewmodel.OnBlacklistUser(image);
 
-        await JsService.SetTabTitle(PageTitle);
-    }
-    
-    // TODO: proper MVVM etc. for this page, getting too big.
-    private async Task OnImageButtonClick(ImageModel image)
-    {
-        Logger.LogInformation("Sending {ImageUrl} to Hydrus service", image.ImageUrl);
-        await Writer.WriteAsync(image);
-    }
-    
-    private async Task OnDownloadAllClick(ImageModel image)
-    {
-        var images = await CivitaiPoller.GetAllImagesFromPost(image.PostId);
-
-        foreach (var imageModel in images)
-        {
-            await Writer.WriteAsync(imageModel);
-        }
-    }
-    
-    private Task OnBlacklistUser(ImageModel image)
-    {
-        CivitaiPoller.BlacklistUser(image.Username);
-        return Task.CompletedTask;
-    }
-
-    public void Dispose()
-    {
-        CivitaiPoller.NewImagesFound -= SetImages;
-        Pusher.OnStateChanged -= OnImageStateChanged;
-        JsService.Dispose();
-    }
+    public void Dispose() => Viewmodel.Dispose();
 }
