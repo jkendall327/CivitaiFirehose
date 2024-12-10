@@ -5,7 +5,7 @@ namespace CivitaiFirehose;
 public interface ICivitaiPoller
 {
     Task PollCivitai(CancellationToken ct);
-    Stack<ImageModel> Images { get; }
+    BoundedQueue<ImageModel> Images { get; }
     Func<int, Task>? NewImagesFound { get; set; }
     void BlacklistUser(string username);
     Task<List<ImageModel>> GetAllImagesFromPost(int postId, CancellationToken ct = default);
@@ -13,7 +13,7 @@ public interface ICivitaiPoller
 
 public class CivitaiPoller(CivitaiClient client, IOptions<CivitaiSettings> options, ILogger<CivitaiPoller> logger) : ICivitaiPoller
 {
-    public Stack<ImageModel> Images { get; } = new(options.Value.QueryDefaults.Limit ?? 20);
+    public BoundedQueue<ImageModel> Images { get; } = new(options.Value.QueryDefaults.Limit ?? 20);
     private readonly HashSet<string> _blacklistedUsers = [..options.Value.ExcludedCreators];
 
     public async Task PollCivitai(CancellationToken ct)
@@ -57,7 +57,7 @@ public class CivitaiPoller(CivitaiClient client, IOptions<CivitaiSettings> optio
 
             found++;
 
-            Images.Push(image);
+            Images.Enqueue(image);
         }
 
         if (found > 0)
@@ -87,7 +87,5 @@ public class CivitaiPoller(CivitaiClient client, IOptions<CivitaiSettings> optio
         return images.ToList();
     }
     
-    public List<ImageModel> GetImages() => Images.ToList();
-
     public Func<int, Task>? NewImagesFound { get; set; }
 }
