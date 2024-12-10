@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace CivitaiFirehose;
 
 public record CivitaiResponse(
@@ -57,7 +59,11 @@ public record Meta(
     string Created_Date,
     bool fluxUltraRaw,
     CivitaiResources[] civitaiResources
-);
+)
+{
+    [JsonIgnore]
+    public int width { get; init; } = width;
+}
 
 public record Hashes(
     string model
