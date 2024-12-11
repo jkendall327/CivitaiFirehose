@@ -3,11 +3,11 @@ using System.Text.Json.Serialization;
 namespace CivitaiFirehose;
 
 public record CivitaiResponse(
-    Items[] items,
+    Item[] items,
     Metadata metadata
 );
 
-public record Items(
+public record Item(
     int id,
     string url,
     string hash,
@@ -61,6 +61,10 @@ public record Meta(
     CivitaiResources[] civitaiResources
 )
 {
+    /// <summary>
+    /// These are both extremely cursed in the Civitai JSON from time to time.
+    /// We don't care about them, so just ignore them.
+    /// </summary>
     [JsonIgnore]
     public int width { get; init; } = width;
 

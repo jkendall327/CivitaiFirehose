@@ -2,7 +2,7 @@ namespace CivitaiFirehose;
 
 public static class TagExtractor
 {
-    public static List<string> GetTagsFromResponse(Items item)
+    public static List<string> GetTagsFromResponse(Item item)
     {
         var tags = new HashSet<string>
         {

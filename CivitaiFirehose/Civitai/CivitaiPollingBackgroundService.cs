@@ -16,11 +16,11 @@ public class CivitaiPollingBackgroundService(
             await civitaiPoller.PollCivitai(ct);
 
             var period = options.Value.PollingPeriod;
-            
+
             logger.LogInformation("Polling Civitai every {PollingPeriod}", period);
-            
+
             using var timer = new PeriodicTimer(period);
-            
+
             while (await timer.WaitForNextTickAsync(ct))
             {
                 logger.LogInformation("Timer elapsed, polling Civitai");
@@ -40,6 +40,10 @@ public class CivitaiPollingBackgroundService(
         catch (OperationCanceledException)
         {
             logger.LogInformation("Image monitoring stopped");
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Error polling Civitai");
         }
     }
 }
