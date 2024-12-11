@@ -1,9 +1,11 @@
+using Microsoft.Extensions.Logging;
+
 namespace CivitaiFirehose;
 
 public class HydrusPusher(    
     IHttpClientFactory factory,
     HydrusClient client,
-    ILogger<HydrusPusherBackgroundService> logger)
+    ILogger<HydrusPusher> logger)
 {
     public event Func<Task>? OnStateChanged;
     private void NotifyStateChanged() => OnStateChanged?.Invoke();
