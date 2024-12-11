@@ -4,18 +4,18 @@ namespace CivitaiFirehose;
 
 public class BoundedQueue<T>(int maxSize) : IEnumerable<T>
 {
-    private readonly Queue<T> _queue = new(maxSize);
+    private readonly LinkedList<T> _list = [];
 
     public void Enqueue(T item)
     {
-        if (_queue.Count == maxSize)
-        {
-            _queue.Dequeue();
-        }
+        _list.AddFirst(item);
 
-        _queue.Enqueue(item);
+        if (_list.Count > maxSize)
+        {
+            _list.RemoveLast();
+        }
     }
 
-    public IEnumerator<T> GetEnumerator() => _queue.GetEnumerator();
-    IEnumerator IEnumerable.GetEnumerator() => _queue.GetEnumerator();
+    public IEnumerator<T> GetEnumerator() => _list.GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => _list.GetEnumerator();
 }
