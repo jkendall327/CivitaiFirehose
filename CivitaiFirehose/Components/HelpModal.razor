@@ -1,0 +1,138 @@
+@if (IsVisible)
+{
+    <div class="modal-backdrop" @onclick="CloseModal">
+        <div class="modal-content" @onclick:stopPropagation="true">
+            <div class="modal-header">
+                <h3>Help</h3>
+                <button class="close-button" @onclick="CloseModal">✕</button>
+            </div>
+            <div class="modal-body">
+                <h4>Image Controls</h4>
+                <div class="help-item">
+                    <span class="button-example">⭐</span>
+                    <p>Push this image to Hydrus. Changes to ⏳ while pushing, ✓ when complete, or ❌ if failed.</p>
+                </div>
+                <div class="help-item">
+                    <span class="button-example">⬇️</span>
+                    <p>Push all images from this post to Hydrus.</p>
+                </div>
+                <div class="help-item">
+                    <span class="button-example">❌</span>
+                    <p>Blacklist this user - their images will no longer appear in your feed.</p>
+                </div>
+                <div class="help-item">
+                    <span class="button-example">🔍</span>
+                    <p>Highlight all visible images from the same post.</p>
+                </div>
+                
+                <h4>Other Features</h4>
+                <ul>
+                    <li>Click any image to open its Civitai post in a new tab</li>
+                    <li>Images are automatically fetched every few seconds</li>
+                    <li>The tab title shows how many new images have arrived while you were away</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    .modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .modal-content {
+        background-color: #1a1a1a;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 600px;
+        color: white;
+    }
+
+    .modal-header {
+        padding: 1rem;
+        border-bottom: 1px solid #333;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-header h3 {
+        margin: 0;
+    }
+
+    .close-button {
+        background: none;
+        border: none;
+        color: #999;
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 0;
+    }
+
+    .close-button:hover {
+        color: white;
+    }
+
+    .modal-body {
+        padding: 1rem;
+    }
+
+    .help-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .button-example {
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .help-item p {
+        margin: 0;
+    }
+
+    h4 {
+        margin-top: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    ul {
+        margin-top: 0.5rem;
+    }
+
+    li {
+        margin-bottom: 0.5rem;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public bool IsVisible { get; set; }
+    
+    [Parameter]
+    public EventCallback<bool> IsVisibleChanged { get; set; }
+
+    private Task CloseModal()
+    {
+        return IsVisibleChanged.InvokeAsync(false);
+    }
+}
