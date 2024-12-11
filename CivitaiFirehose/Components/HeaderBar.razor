@@ -7,13 +7,14 @@
             <button class="search-button">Search</button>
         </div>
         <div class="header-buttons">
-            <button class="header-button">Settings</button>
+            <button class="header-button" @onclick="ShowSettings">Settings</button>
             <button class="header-button" @onclick="ShowHelp">Help</button>
         </div>
     </div>
 </header>
 
 <HelpModal @bind-IsVisible="_showHelp" />
+<SettingsModal @bind-IsVisible="_showSettings" />
 
 <style>
     .header {
@@ -96,5 +97,7 @@
 
 @code {
     private bool _showHelp;
+    private bool _showSettings;
     private void ShowHelp() => _showHelp = true;
+    private void ShowSettings() => _showSettings = true;
 }
