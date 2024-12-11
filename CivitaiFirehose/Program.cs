@@ -25,6 +25,8 @@ builder.Services.AddCivitaiServices(builder.Configuration);
 builder.Services.AddHydrusServices(builder.Configuration);
 builder.Services.AddWebServices();
 
+builder.Services.AddSystemd();
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
