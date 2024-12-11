@@ -11,7 +11,7 @@ public interface ICivitaiPoller
     Task<List<ImageModel>> GetAllImagesFromPost(int postId, CancellationToken ct = default);
 }
 
-public class CivitaiPoller(CivitaiClient client, IOptions<CivitaiSettings> options, ILogger<CivitaiPoller> logger) : ICivitaiPoller
+public class CivitaiService(CivitaiClient client, IOptions<CivitaiSettings> options, ILogger<CivitaiService> logger) : ICivitaiPoller
 {
     public BoundedQueue<ImageModel> Images { get; } = new(options.Value.QueryDefaults.Limit ?? 20);
     private readonly HashSet<string> _blacklistedUsers = [..options.Value.ExcludedCreators];
