@@ -13,6 +13,7 @@ public sealed class HomeViewmodel(
     public IEnumerable<ImageModel> Images => civitaiPoller.Images;
     public string PageTitle { get; private set; } = "Civitai Firehose";
     private int Unseen { get; set; }
+    public int? HighlightedPostId { get; private set; }
     public event Func<Task>? StateUpdated;
 
     public void OnInitialized()
@@ -72,6 +73,13 @@ public sealed class HomeViewmodel(
     {
         civitaiPoller.BlacklistUser(image.Username);
         return Task.CompletedTask;
+    }
+    
+    public async Task OnHighlightRelatedImages(ImageModel image)
+    {
+        // If clicking the same post ID, clear the highlight.
+        HighlightedPostId = HighlightedPostId == image.PostId ? null : image.PostId;
+        await NotifyStateChanged();
     }
     
     public string GetDownloadStatusIcon(ImageModel image)

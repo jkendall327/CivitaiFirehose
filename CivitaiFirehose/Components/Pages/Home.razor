@@ -14,7 +14,7 @@
     @foreach (var image in Viewmodel.Images)
     {
         <div class="grid-item">
-            <div class="image-container">
+            <div class="image-container @(image.PostId == Viewmodel.HighlightedPostId ? "highlighted" : "")">
                 <a href="@image.PostUrl" target="_blank">
                     <img src="@image.ImageUrl" alt="Grid Item">
                 </a>
@@ -26,6 +26,9 @@
                 </button>
                 <button class="overlay-button blacklist-button" @onclick="() => OnBlacklistUser(image)">
                     ❌
+                </button>
+                <button class="overlay-button highlight-button" @onclick="() => OnHighlightRelatedImages(image)">
+                    🔍
                 </button>
             </div>
         </div>
@@ -53,6 +56,7 @@
     private async Task OnImageButtonClick(ImageModel image) => await Viewmodel.OnImageButtonClick(image);
     private async Task OnDownloadAllClick(ImageModel image) => await Viewmodel.OnDownloadAllClick(image);
     private async Task OnBlacklistUser(ImageModel image) => await Viewmodel.OnBlacklistUser(image);
+    private Task OnHighlightRelatedImages(ImageModel image) => Viewmodel.OnHighlightRelatedImages(image);
 
     public void Dispose() => Viewmodel.Dispose();
 }
