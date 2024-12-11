@@ -14,6 +14,7 @@ public sealed class HomeViewmodel(
     public string PageTitle { get; private set; } = "Civitai Firehose";
     private int Unseen { get; set; }
     public int? HighlightedPostId { get; private set; }
+    public int? ImagesInHighlightedPost { get; set; }
     public event Func<Task>? StateUpdated;
 
     public void OnInitialized()
@@ -78,7 +79,17 @@ public sealed class HomeViewmodel(
     public async Task OnHighlightRelatedImages(ImageModel image)
     {
         // If clicking the same post ID, clear the highlight.
-        HighlightedPostId = HighlightedPostId == image.PostId ? null : image.PostId;
+        if (HighlightedPostId == image.PostId)
+        {
+            HighlightedPostId = null;
+            ImagesInHighlightedPost = null;
+        }
+        else
+        {
+            HighlightedPostId = image.PostId;
+            ImagesInHighlightedPost = Images.Count(s => s.PostId == image.PostId);
+        }
+        
         await NotifyStateChanged();
     }
     
@@ -96,6 +107,32 @@ public sealed class HomeViewmodel(
             ImagePushStatus.Succeeded => "\u2713",
             var _ => throw new ArgumentOutOfRangeException(nameof(image))
         };
+    }
+
+    public string GetHighlightStatusIcon()
+    {
+        if (ImagesInHighlightedPost is null)
+        {
+            // 🔍
+            return "\ud83d\udd0d";
+        }
+
+        var icon = ImagesInHighlightedPost switch
+        {
+            0 => throw new ArgumentOutOfRangeException(nameof(ImagesInHighlightedPost)),
+            1 => "1️⃣",
+            2 => "2️⃣",
+            3 => "3️⃣",
+            4 => "4️⃣",
+            5 => "5️⃣",
+            6 => "6️⃣",
+            7 => "7️⃣",
+            8 => "8️⃣",
+            9 => "9️⃣",
+            var _ => "➕"
+        };
+
+        return icon;
     }
 
     public void Dispose()

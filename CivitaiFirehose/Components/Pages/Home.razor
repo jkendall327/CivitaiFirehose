@@ -29,7 +29,7 @@
                     ❌
                 </button>
                 <button class="overlay-button highlight-button" @onclick="() => OnHighlightRelatedImages(image)">
-                    🔍
+                    @GetHighlightStatusIcon()
                 </button>
             </div>
         </div>
@@ -38,6 +38,7 @@
 
 @code {
     public string GetDownloadStatusIcon(ImageModel image) => Viewmodel.GetDownloadStatusIcon(image);
+    public string GetHighlightStatusIcon() => Viewmodel.GetHighlightStatusIcon();
 
     protected override void OnInitialized()
     {
