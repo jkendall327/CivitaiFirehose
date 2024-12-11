@@ -4,13 +4,13 @@ using CivitaiFirehose.Components.Pages;
 namespace CivitaiFirehose;
 
 public sealed class HomeViewmodel(
-    ICivitaiPoller civitaiPoller,
+    ICivitaiService civitaiService,
     JsService jsService,
     HydrusPusher pusher,
     ChannelWriter<ImageModel> writer,
     ILogger<HomeViewmodel> logger) : IDisposable
 {
-    public IEnumerable<ImageModel> Images => civitaiPoller.Images;
+    public IEnumerable<ImageModel> Images => civitaiService.Images;
     public string PageTitle { get; private set; } = "Civitai Firehose";
     private int Unseen { get; set; }
     public int? HighlightedPostId { get; private set; }
@@ -19,7 +19,7 @@ public sealed class HomeViewmodel(
 
     public void OnInitialized()
     {
-        civitaiPoller.NewImagesFound += SetImages;
+        civitaiService.NewImagesFound += SetImages;
         pusher.OnStateChanged += NotifyStateChanged;
     }
 
@@ -62,7 +62,7 @@ public sealed class HomeViewmodel(
 
     public async Task OnDownloadAllClick(ImageModel image)
     {
-        var images = await civitaiPoller.GetAllImagesFromPost(image.PostId);
+        var images = await civitaiService.GetAllImagesFromPost(image.PostId);
 
         foreach (var imageModel in images)
         {
@@ -72,7 +72,7 @@ public sealed class HomeViewmodel(
 
     public Task OnBlacklistUser(ImageModel image)
     {
-        civitaiPoller.BlacklistUser(image.Username);
+        civitaiService.BlacklistUser(image.Username);
         return Task.CompletedTask;
     }
     
@@ -137,7 +137,7 @@ public sealed class HomeViewmodel(
 
     public void Dispose()
     {
-        civitaiPoller.NewImagesFound -= SetImages;
+        civitaiService.NewImagesFound -= SetImages;
         pusher.OnStateChanged -= NotifyStateChanged;
         jsService.Dispose();
     }

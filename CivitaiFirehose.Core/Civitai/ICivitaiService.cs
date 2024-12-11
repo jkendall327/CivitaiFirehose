@@ -1,6 +1,6 @@
 namespace CivitaiFirehose;
 
-public interface ICivitaiPoller
+public interface ICivitaiService
 {
     /// <summary>
     /// The most recent haul of images from Civitai.

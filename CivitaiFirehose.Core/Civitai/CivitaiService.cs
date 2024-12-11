@@ -6,7 +6,7 @@ namespace CivitaiFirehose;
 public class CivitaiService(
     CivitaiClient client, 
     IOptions<CivitaiSettings> options, 
-    ILogger<CivitaiService> logger) : ICivitaiPoller
+    ILogger<CivitaiService> logger) : ICivitaiService
 {
     // Given a default value to avoid annoying nullability. We assume the UI will always actually hook onto this.
     public Func<int, Task> NewImagesFound { get; set; } = _ => Task.CompletedTask;

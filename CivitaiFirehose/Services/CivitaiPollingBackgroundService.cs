@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 namespace CivitaiFirehose;
 
 public class CivitaiPollingBackgroundService(
-    ICivitaiPoller civitaiPoller,
+    ICivitaiService civitaiService,
     IOptions<CivitaiSettings> options,
     ILogger<CivitaiPollingBackgroundService> logger) : BackgroundService
 {
@@ -13,7 +13,7 @@ public class CivitaiPollingBackgroundService(
         try
         {
             // Run immediately once on startup.
-            await civitaiPoller.PollCivitai(ct);
+            await civitaiService.PollCivitai(ct);
 
             var period = options.Value.PollingPeriod;
 
@@ -27,7 +27,7 @@ public class CivitaiPollingBackgroundService(
 
                 try
                 {
-                    await civitaiPoller.PollCivitai(ct);
+                    await civitaiService.PollCivitai(ct);
                 }
                 catch (HttpRequestException e) when (e.StatusCode == HttpStatusCode.ServiceUnavailable)
                 {

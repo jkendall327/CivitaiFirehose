@@ -15,7 +15,7 @@ public static class ServiceCollectionExtensions
             
         // Civitai specific services
         services.AddHttpClient<CivitaiClient>();
-        services.AddSingleton<ICivitaiPoller, CivitaiService>();
+        services.AddSingleton<ICivitaiService, CivitaiService>();
         services.AddHostedService<CivitaiPollingBackgroundService>();
 
         services.AddScoped<HomeViewmodel>();
