@@ -1,115 +1,135 @@
+@using Microsoft.Extensions.Options
+@inject IOptions<CivitaiSettings> CivitaiOptions
+@inject IOptions<HydrusSettings> HydrusOptions
+
 @if (IsVisible)
 {
     <div class="modal-backdrop" @onclick="CloseModal">
         <div class="modal-content" @onclick:stopPropagation="true">
             <div class="modal-header">
-                <h3>Help</h3>
+                <h3>Settings</h3>
                 <button class="close-button" @onclick="CloseModal">✕</button>
             </div>
             <div class="modal-body">
-                Foobar. Foobar foobar foobar.
+                <h4>Civitai Settings</h4>
+                <div class="settings-section">
+                    <div class="setting-item">
+                        <span class="setting-label">Polling Period:</span>
+                        <span class="setting-value">@CivitaiOptions.Value.PollingPeriod</span>
+                    </div>
+
+                    <div class="setting-item">
+                        <span class="setting-label">Excluded Creators:</span>
+                        <span class="setting-value">
+                            @if (CivitaiOptions.Value.ExcludedCreators.Any())
+                            {
+                                @string.Join(", ", CivitaiOptions.Value.ExcludedCreators)
+                            }
+                            else
+                            {
+                                <em>None</em>
+                            }
+                        </span>
+                    </div>
+
+                    <h5>Query Defaults</h5>
+                    <div class="setting-item">
+                        <span class="setting-label">Limit:</span>
+                        <span
+                            class="setting-value">@(CivitaiOptions.Value.QueryDefaults.Limit?.ToString() ?? "<not set>")</span>
+                    </div>
+                    <div class="setting-item">
+                        <span class="setting-label">NSFW Level:</span>
+                        <span
+                            class="setting-value">@(CivitaiOptions.Value.QueryDefaults.Nsfw?.ToString() ?? "<not set>")</span>
+                    </div>
+                    <div class="setting-item">
+                        <span class="setting-label">Sort:</span>
+                        <span
+                            class="setting-value">@(CivitaiOptions.Value.QueryDefaults.Sort?.ToString() ?? "<not set>")</span>
+                    </div>
+                    <div class="setting-item">
+                        <span class="setting-label">Period:</span>
+                        <span
+                            class="setting-value">@(CivitaiOptions.Value.QueryDefaults.Period?.ToString() ?? "<not set>")</span>
+                    </div>
+                    <div class="setting-item">
+                        <span class="setting-label">Post ID:</span>
+                        <span
+                            class="setting-value">@(CivitaiOptions.Value.QueryDefaults.PostId?.ToString() ?? "<not set>")</span>
+                    </div>
+                    <div class="setting-item">
+                        <span class="setting-label">Model ID:</span>
+                        <span
+                            class="setting-value">@(CivitaiOptions.Value.QueryDefaults.ModelId?.ToString() ?? "<not set>")</span>
+                    </div>
+                    <div class="setting-item">
+                        <span class="setting-label">Model Version ID:</span>
+                        <span
+                            class="setting-value">@(CivitaiOptions.Value.QueryDefaults.ModelVersionId?.ToString() ?? "<not set>")</span>
+                    </div>
+                    <div class="setting-item">
+                        <span class="setting-label">Username:</span>
+                        <span class="setting-value">@(CivitaiOptions.Value.QueryDefaults.Username ?? "<not set>")</span>
+                    </div>
+                    <div class="setting-item">
+                        <span class="setting-label">Page:</span>
+                        <span
+                            class="setting-value">@(CivitaiOptions.Value.QueryDefaults.Page?.ToString() ?? "<not set>")</span>
+                    </div>
+                </div>
+
+                <h4>Hydrus Settings</h4>
+                <div class="settings-section">
+                    <div class="setting-item">
+                        <span class="setting-label">Base URL:</span>
+                        <span class="setting-value">@HydrusOptions.Value.BaseUrl</span>
+                    </div>
+                    <div class="setting-item">
+                        <span class="setting-label">API Key:</span>
+                        <span class="setting-value">@HydrusOptions.Value.ApiKey</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 }
 
 <style>
-    .modal-backdrop {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
+    .settings-section {
+        margin-bottom: 2rem;
+    }
+
+    .setting-item {
         display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-    }
-
-    .modal-content {
-        background-color: #1a1a1a;
-        border-radius: 8px;
-        width: 90%;
-        max-width: 600px;
-        color: white;
-    }
-
-    .modal-header {
-        padding: 1rem;
-        border-bottom: 1px solid #333;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .modal-header h3 {
-        margin: 0;
-    }
-
-    .close-button {
-        background: none;
-        border: none;
-        color: #999;
-        font-size: 1.5rem;
-        cursor: pointer;
-        padding: 0;
-    }
-
-    .close-button:hover {
-        color: white;
-    }
-
-    .modal-body {
-        padding: 1rem;
-    }
-
-    .help-item {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        margin-bottom: 1rem;
-    }
-
-    .button-example {
-        background-color: rgba(0, 0, 0, 0.5);
-        color: white;
-        border-radius: 50%;
-        width: 32px;
-        height: 32px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-    }
-
-    .help-item p {
-        margin: 0;
-    }
-
-    h4 {
-        margin-top: 1.5rem;
-        margin-bottom: 1rem;
-    }
-
-    ul {
-        margin-top: 0.5rem;
-    }
-
-    li {
         margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .setting-label {
+        width: 150px;
+        color: #999;
+    }
+
+    .setting-value {
+        flex: 1;
+    }
+
+    h5 {
+        margin: 1rem 0 0.5rem 0;
+        color: #999;
+        font-size: 1rem;
     }
 </style>
 
 @code {
-    [Parameter]
-    public bool IsVisible { get; set; }
-    
-    [Parameter]
-    public EventCallback<bool> IsVisibleChanged { get; set; }
+    [Parameter] public bool IsVisible { get; set; }
+
+    [Parameter] public EventCallback<bool> IsVisibleChanged { get; set; }
 
     private Task CloseModal()
     {
         return IsVisibleChanged.InvokeAsync(false);
     }
+
 }
