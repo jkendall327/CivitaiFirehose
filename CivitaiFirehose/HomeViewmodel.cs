@@ -20,7 +20,7 @@ public sealed class HomeViewmodel(
     public event Func<Task>? StateUpdated;
     
     private readonly CancellationTokenSource _timerCancellationToken = new();
-
+    
     public async Task OnInitialized()
     {
         imageService.NewImagesFound += OnNewImagesFound;

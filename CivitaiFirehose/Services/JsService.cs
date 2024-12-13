@@ -6,6 +6,7 @@ namespace CivitaiFirehose;
 public sealed class JsService(IJSRuntime js) : IDisposable
 {
     private DotNetObjectReference<Home>? _dotNetReference;
+    private bool _jsInitialised;
 
     public async Task Initialise(Home component)
     {
@@ -24,10 +25,13 @@ public sealed class JsService(IJSRuntime js) : IDisposable
         ");
             
         await js.InvokeVoidAsync("tabVisibilityHandler.initialize", _dotNetReference);
+        _jsInitialised = true;
     }
 
     public async Task SetTabTitle(string title)
     {
+        if (!_jsInitialised) return;
+        
         await js.InvokeVoidAsync("eval", $"document.title = '{title}'");
     }
 
