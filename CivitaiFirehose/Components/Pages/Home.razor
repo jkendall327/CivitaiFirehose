@@ -40,9 +40,9 @@
     public string GetDownloadStatusIcon(ImageModel image) => Viewmodel.GetDownloadStatusIcon(image);
     public string GetHighlightStatusIcon() => Viewmodel.GetHighlightStatusIcon();
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        Viewmodel.OnInitialized();
+        await Viewmodel.OnInitialized();
         Viewmodel.StateUpdated += async () => await InvokeAsync(StateHasChanged);
     }
 

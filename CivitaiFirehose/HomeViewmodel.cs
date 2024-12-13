@@ -18,11 +18,15 @@ public sealed class HomeViewmodel(
     public int? HighlightedPostId { get; private set; }
     public int? ImagesInHighlightedPost { get; set; }
     public event Func<Task>? StateUpdated;
+    
+    private readonly CancellationTokenSource _timerCancellationToken = new();
 
-    public void OnInitialized()
+    public async Task OnInitialized()
     {
         imageService.NewImagesFound += OnNewImagesFound;
         pusher.OnStateChanged += NotifyStateChanged;
+
+        await PopulateFeedWithNewestImages();
     }
 
     private async Task NotifyStateChanged()
@@ -31,7 +35,24 @@ public sealed class HomeViewmodel(
         await StateUpdated();
     }
 
-    public async Task OnAfterRenderAsync(Home home) => await jsService.Initialise(home);
+    public async Task OnAfterRenderAsync(Home home)
+    {
+        await jsService.Initialise(home);
+        
+        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(5));
+        
+        while (!_timerCancellationToken.IsCancellationRequested && await timer.WaitForNextTickAsync())
+        {
+            await PopulateFeedWithNewestImages();
+            await NotifyStateChanged();
+        }
+    }
+
+    private async Task PopulateFeedWithNewestImages()
+    {
+        var results = await civitaiService.GetNewestImages();
+        await imageService.Enqueue(results);
+    }
 
     private async Task OnNewImagesFound(int newCount)
     {
@@ -145,5 +166,6 @@ public sealed class HomeViewmodel(
         imageService.NewImagesFound -= OnNewImagesFound;
         pusher.OnStateChanged -= NotifyStateChanged;
         jsService.Dispose();
+        _timerCancellationToken.Dispose();
     }
 }

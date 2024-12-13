@@ -11,6 +11,7 @@ public class CivitaiPollingBackgroundService(
 {
     protected override async Task ExecuteAsync(CancellationToken ct)
     {
+        return;
         try
         {
             // Run immediately once on startup.

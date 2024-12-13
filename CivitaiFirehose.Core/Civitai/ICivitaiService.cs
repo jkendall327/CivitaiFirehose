@@ -5,7 +5,7 @@ public interface ICivitaiService
     /// <summary>
     /// Scrapes Civitai for new images.
     /// </summary>
-    Task<List<ImageModel>> GetNewestImages(CancellationToken ct);
+    Task<List<ImageModel>> GetNewestImages(CancellationToken ct = default);
     
     /// <summary>
     /// Gets all the images from a specified Civitai post.
