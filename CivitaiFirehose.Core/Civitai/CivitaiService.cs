@@ -16,7 +16,9 @@ public class CivitaiService(
     
     public async Task PollCivitai(CancellationToken ct)
     {
-        var response = await client.GetImages(ct);
+        var query = options.Value.QueryDefaults.Clone();
+        
+        var response = await client.GetImages(query, ct);
 
         var found = 0;
 
@@ -44,7 +46,12 @@ public class CivitaiService(
 
     public async Task<List<ImageModel>> GetAllImagesFromPost(int postId, CancellationToken ct = default)
     {
-        var response = await client.GetImagesFromPost(postId, ct);
+        var query = options.Value.QueryDefaults.Clone();
+        
+        query.PostId = postId;
+        query.Limit = 200;
+        
+        var response = await client.GetImages(query, ct);
         
         var images = response.items.Select(ToImageModel);
 

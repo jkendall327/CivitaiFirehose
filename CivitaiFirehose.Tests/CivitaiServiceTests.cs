@@ -32,7 +32,7 @@ public class CivitaiServiceTests
         options.Value.Returns(settings);
         optionsMonitor.CurrentValue.Returns(settings);
         
-        var client = new CivitaiClient(httpClient, optionsMonitor, NullLogger<CivitaiClient>.Instance);
+        var client = new CivitaiClient(httpClient, NullLogger<CivitaiClient>.Instance);
         
         _service = new(client, options, NullLogger<CivitaiService>.Instance);
         
