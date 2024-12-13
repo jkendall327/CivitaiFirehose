@@ -13,7 +13,7 @@ public class CivitaiPollingBackgroundService(
         try
         {
             // Run immediately once on startup.
-            await civitaiService.PollCivitai(ct);
+            await civitaiService.GetNewestImages(ct);
 
             var period = options.Value.PollingPeriod;
 
@@ -27,7 +27,7 @@ public class CivitaiPollingBackgroundService(
 
                 try
                 {
-                    await civitaiService.PollCivitai(ct);
+                    await civitaiService.GetNewestImages(ct);
                 }
                 catch (HttpRequestException e) when (e.StatusCode == HttpStatusCode.ServiceUnavailable)
                 {

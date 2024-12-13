@@ -67,7 +67,7 @@ public sealed class HomeViewmodel(
 
     public async Task OnDownloadAllClick(ImageModel image)
     {
-        var images = await civitaiService.GetAllImagesFromPost(image.PostId);
+        var images = await civitaiService.GetImagesFromPost(image.PostId);
 
         foreach (var imageModel in images)
         {
