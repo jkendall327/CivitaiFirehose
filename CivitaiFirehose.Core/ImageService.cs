@@ -12,7 +12,7 @@ public class ImageService(
     public Func<int, Task> NewImagesFound { get; set; } = _ => Task.CompletedTask;
     public BoundedQueue<ImageModel> Images { get; } = new(options.Value.QueryDefaults.Limit ?? 20);
 
-    private async Task EnqueueImages(IEnumerable<ImageModel> images)
+    public async Task EnqueueImages(IEnumerable<ImageModel> images)
     {
         var found = 0;
 
