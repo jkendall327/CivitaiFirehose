@@ -1,10 +1,17 @@
 @namespace CivitaiFirehose.Components.Layout
+@inject NavigationManager NavigationManager
 
 <header class="header">
     <div class="header-content">
         <div class="search-container">
-            <input type="text" placeholder="Search..." class="search-input" />
-            <button class="search-button">Search</button>
+            <input type="text"
+                   @bind="_searchInput"
+                   @bind:event="oninput"
+                   @onkeyup="HandleKeyPress"
+                   placeholder="Enter a Civitai post/model ID..."
+                   class="search-input"/>
+            <button class="search-button" @onclick="SearchForPosts">Posts</button>
+            <button class="search-button" @onclick="SearchForModels">Models</button>
         </div>
         <div class="header-buttons">
             <button class="header-button" @onclick="ShowSettings">Settings</button>
@@ -13,8 +20,8 @@
     </div>
 </header>
 
-<HelpModal @bind-IsVisible="_showHelp" />
-<SettingsModal @bind-IsVisible="_showSettings" />
+<HelpModal @bind-IsVisible="_showHelp"/>
+<SettingsModal @bind-IsVisible="_showSettings"/>
 
 <style>
     .header {
@@ -96,8 +103,32 @@
 </style>
 
 @code {
+    private string _searchInput = "";
     private bool _showHelp;
     private bool _showSettings;
+
     private void ShowHelp() => _showHelp = true;
     private void ShowSettings() => _showSettings = true;
+
+    private void SearchForPosts() => Search("modelId");
+    private void SearchForModels() => Search("postId");
+
+    private void Search(string urlQuery)
+    {
+        if (string.IsNullOrWhiteSpace(_searchInput)) return;
+
+        if (int.TryParse(_searchInput, out var id))
+        {
+            NavigationManager.NavigateTo($"/?{urlQuery}={id}");
+        }
+    }
+
+    private void HandleKeyPress(KeyboardEventArgs e)
+    {
+        // TODO: is there a sensible way to have keyboard shortcuts for both posts and models?
+        if (e.Key == "Enter")
+        {
+            SearchForPosts();
+        }
+    }
 }

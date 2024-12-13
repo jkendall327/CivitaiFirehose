@@ -20,13 +20,19 @@ public sealed class HomeViewmodel(
     public event Func<Task>? StateUpdated;
     
     private readonly CancellationTokenSource _timerCancellationToken = new();
+
+    private int? _postId;
+    private int? _modelId;
     
-    public async Task OnInitialized()
+    public async Task OnInitialized(int? postId = null, int? modelId = null)
     {
+        _postId = postId;
+        _modelId = modelId;
+        
         imageService.NewImagesFound += OnNewImagesFound;
         pusher.OnStateChanged += NotifyStateChanged;
 
-        await PopulateFeedWithNewestImages();
+        await PopulateFeed();
     }
 
     private async Task NotifyStateChanged()
@@ -43,15 +49,35 @@ public sealed class HomeViewmodel(
         
         while (!_timerCancellationToken.IsCancellationRequested && await timer.WaitForNextTickAsync())
         {
-            await PopulateFeedWithNewestImages();
+            await PopulateFeed();
             await NotifyStateChanged();
         }
     }
 
-    private async Task PopulateFeedWithNewestImages()
+    private async Task PopulateFeed()
     {
-        var results = await civitaiService.GetNewestImages();
-        await imageService.Enqueue(results);
+        if (_postId is not null && _modelId is not null)
+        {
+            throw new InvalidOperationException("Cannot be set to both a post and a model");
+        }
+        
+        if (_postId is null && _modelId is null)
+        {
+            var results = await civitaiService.GetNewestImages();
+            await imageService.Enqueue(results);
+        }
+
+        if (_postId is not null)
+        {
+            var result = await civitaiService.GetImagesFromPost(_postId.Value);
+            await imageService.Enqueue(result);
+        }
+
+        if (_modelId is not null)
+        {
+            var result = await civitaiService.GetImagesFromModel(_modelId.Value);
+            await imageService.Enqueue(result);
+        }
     }
 
     private async Task OnNewImagesFound(int newCount)

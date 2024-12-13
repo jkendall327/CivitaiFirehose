@@ -37,12 +37,20 @@
 </div>
 
 @code {
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public int? PostId { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public int? ModelId { get; set; }
+    
     public string GetDownloadStatusIcon(ImageModel image) => Viewmodel.GetDownloadStatusIcon(image);
     public string GetHighlightStatusIcon() => Viewmodel.GetHighlightStatusIcon();
 
     protected override async Task OnInitializedAsync()
     {
-        await Viewmodel.OnInitialized();
+        await Viewmodel.OnInitialized(PostId, ModelId);
         Viewmodel.StateUpdated += async () => await InvokeAsync(StateHasChanged);
     }
 
