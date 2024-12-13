@@ -12,13 +12,16 @@ public static class ServiceCollectionExtensions
         services.AddSingleton(channel.Reader);
 
         services.Configure<CivitaiSettings>(configuration.GetSection(nameof(CivitaiSettings)));
-            
+        
+        // Stateless
+        services.AddHttpClient<CivitaiClient>();
         services.AddSingleton<ICivitaiService, CivitaiService>();
-        services.AddSingleton<BlacklistStore>();
         services.AddSingleton<ImageMapper>();
+        
+        // Stateful
+        services.AddSingleton<BlacklistStore>();
         services.AddSingleton<ImageService>();
         
-        services.AddHttpClient<CivitaiClient>();
         services.AddHostedService<CivitaiPollingBackgroundService>();
         services.AddScoped<HomeViewmodel>();
         
