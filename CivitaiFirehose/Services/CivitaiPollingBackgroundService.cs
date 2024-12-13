@@ -5,6 +5,7 @@ namespace CivitaiFirehose;
 
 public class CivitaiPollingBackgroundService(
     ICivitaiService civitaiService,
+    ImageService imageService,
     IOptions<CivitaiSettings> options,
     ILogger<CivitaiPollingBackgroundService> logger) : BackgroundService
 {
@@ -13,7 +14,7 @@ public class CivitaiPollingBackgroundService(
         try
         {
             // Run immediately once on startup.
-            await civitaiService.GetNewestImages(ct);
+            await PopulateFeedFromCivitai(ct);
 
             var period = options.Value.PollingPeriod;
 
@@ -27,7 +28,7 @@ public class CivitaiPollingBackgroundService(
 
                 try
                 {
-                    await civitaiService.GetNewestImages(ct);
+                    await PopulateFeedFromCivitai(ct);
                 }
                 catch (HttpRequestException e) when (e.StatusCode == HttpStatusCode.ServiceUnavailable)
                 {
@@ -45,5 +46,11 @@ public class CivitaiPollingBackgroundService(
         {
             logger.LogError(e, "Error polling Civitai");
         }
+    }
+
+    private async Task PopulateFeedFromCivitai(CancellationToken ct)
+    {
+        var images = await civitaiService.GetNewestImages(ct);
+        await imageService.Enqueue(images);
     }
 }
