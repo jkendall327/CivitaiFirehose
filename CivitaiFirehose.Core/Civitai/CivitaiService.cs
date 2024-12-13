@@ -4,15 +4,14 @@ using Microsoft.Extensions.Options;
 namespace CivitaiFirehose;
 
 public class CivitaiService(
-    CivitaiClient client, 
+    CivitaiClient client,
+    BlacklistStore blacklist,
     IOptions<CivitaiSettings> options, 
     ILogger<CivitaiService> logger) : ICivitaiService
 {
     // Given a default value to avoid annoying nullability. We assume the UI will always actually hook onto this.
     public Func<int, Task> NewImagesFound { get; set; } = _ => Task.CompletedTask;
     public BoundedQueue<ImageModel> Images { get; } = new(options.Value.QueryDefaults.Limit ?? 20);
-
-    private readonly HashSet<string> _blacklistedUsers = [..options.Value.ExcludedCreators];
     
     public async Task PollCivitai(CancellationToken ct)
     {
@@ -25,7 +24,7 @@ public class CivitaiService(
         foreach (var img in response.items)
         {
             if (Images.Any(s => s.ImageUrl == img.url)) continue;
-            if (_blacklistedUsers.Contains(img.username)) continue;
+            if (blacklist.IsBlacklisted(img.username)) continue;
             
             var image = ToImageModel(img);
             
@@ -42,8 +41,6 @@ public class CivitaiService(
         await NewImagesFound(found);
     }
     
-    public void BlacklistUser(string username) => _blacklistedUsers.Add(username);
-
     public async Task<List<ImageModel>> GetAllImagesFromPost(int postId, CancellationToken ct = default)
     {
         var query = options.Value.QueryDefaults.Clone();

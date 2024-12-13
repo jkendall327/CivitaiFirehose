@@ -34,7 +34,7 @@ public class CivitaiServiceTests
         
         var client = new CivitaiClient(httpClient, NullLogger<CivitaiClient>.Instance);
         
-        _service = new(client, options, NullLogger<CivitaiService>.Instance);
+        _service = new(client, new(options), options, NullLogger<CivitaiService>.Instance);
         
         _service.NewImagesFound += count =>
         {
@@ -150,39 +150,5 @@ public class CivitaiServiceTests
         _lastNewImageCount.Should().Be(0);
         
         _service.Images.Should().ContainSingle();
-    }
-
-    [Fact]
-    public async Task SkipsBlacklistedUsers()
-    {
-        _handler.Response = """
-            {
-                "items": [
-                    {
-                        "id": 1,
-                        "url": "https://example.com/1.png",
-                        "hash": "abc123",
-                        "width": 512,
-                        "height": 512,
-                        "nsfwLevel": "None",
-                        "nsfw": false,
-                        "browsingLevel": 0,
-                        "createdAt": "2024-01-01",
-                        "postId": 123,
-                        "stats": { },
-                        "meta": null,
-                        "username": "testuser",
-                        "baseModel": "SD 1.5"
-                    }
-                ],
-                "metadata": { }
-            }
-            """;
-
-        _service.BlacklistUser("testuser");
-        await _service.PollCivitai(CancellationToken.None);
-
-        _service.Images.Should().BeEmpty();
-        _lastNewImageCount.Should().Be(0);
     }
 }

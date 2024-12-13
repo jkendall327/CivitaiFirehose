@@ -16,11 +16,6 @@ public interface ICivitaiService
     /// Scrapes Civitai for new images.
     /// </summary>
     Task PollCivitai(CancellationToken ct);
-
-    /// <summary>
-    /// Marks a user such that new images from them will not be added to <see cref="Images"/>.
-    /// </summary>
-    void BlacklistUser(string username);
     
     /// <summary>
     /// Gets all the images from a specified Civitai post.

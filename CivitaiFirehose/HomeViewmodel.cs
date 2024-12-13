@@ -7,6 +7,7 @@ public sealed class HomeViewmodel(
     ICivitaiService civitaiService,
     JsService jsService,
     HydrusPusher pusher,
+    BlacklistStore blacklist,
     ChannelWriter<ImageModel> writer,
     ILogger<HomeViewmodel> logger) : IDisposable
 {
@@ -72,7 +73,7 @@ public sealed class HomeViewmodel(
 
     public Task OnBlacklistUser(ImageModel image)
     {
-        civitaiService.BlacklistUser(image.Username);
+        blacklist.BlacklistUser(image.Username);
         return Task.CompletedTask;
     }
     
