@@ -21,7 +21,7 @@ public sealed class HomeViewmodel(
 
     public void OnInitialized()
     {
-        imageService.NewImagesFound += SetImages;
+        imageService.NewImagesFound += OnNewImagesFound;
         pusher.OnStateChanged += NotifyStateChanged;
     }
 
@@ -33,11 +33,14 @@ public sealed class HomeViewmodel(
 
     public async Task OnAfterRenderAsync(Home home) => await jsService.Initialise(home);
 
-    private async Task SetImages(int newCount)
+    private async Task OnNewImagesFound(int newCount)
     {
         logger.LogInformation("Got {ImageCount} new images from service, updating UI", newCount);
+        
         Unseen += newCount;
+        
         PageTitle = $"Civitai Firehose ({Unseen})";
+        
         await jsService.SetTabTitle(PageTitle);
 
         await NotifyStateChanged();
@@ -139,7 +142,7 @@ public sealed class HomeViewmodel(
 
     public void Dispose()
     {
-        imageService.NewImagesFound -= SetImages;
+        imageService.NewImagesFound -= OnNewImagesFound;
         pusher.OnStateChanged -= NotifyStateChanged;
         jsService.Dispose();
     }
