@@ -45,6 +45,13 @@ public sealed class HomeViewmodel(
     {
         await jsService.Initialise(home);
         
+        if (_postId is not null || _modelId is not null)
+        {
+            // Only set up the live feed when polling for newest images.
+            // No point continually polling for new pics when looking at a model or post!
+            return;
+        }
+        
         using var timer = new PeriodicTimer(TimeSpan.FromSeconds(5));
         
         while (!_timerCancellationToken.IsCancellationRequested && await timer.WaitForNextTickAsync())
