@@ -15,6 +15,10 @@ public class BoundedQueue<T>(int maxSize) : IEnumerable<T>
             _list.RemoveLast();
         }
     }
+    
+    public void Clear() => _list.Clear();
+    
+    public IReadOnlyList<T> AsReadOnly() => new List<T>(_list).AsReadOnly();
 
     public IEnumerator<T> GetEnumerator() => _list.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => _list.GetEnumerator();

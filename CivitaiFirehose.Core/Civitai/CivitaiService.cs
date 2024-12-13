@@ -17,7 +17,7 @@ public class CivitaiService(
 
         var images = response.items.Select(mapper.ToImageModel);
         
-        await imageService.EnqueueImages(images);
+        await imageService.Enqueue(images);
     }
     
     public async Task<List<ImageModel>> GetAllImagesFromPost(int postId, CancellationToken ct = default)

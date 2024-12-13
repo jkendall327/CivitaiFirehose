@@ -3,25 +3,23 @@ using Microsoft.Extensions.Options;
 
 namespace CivitaiFirehose;
 
-public class ImageService(
-    BlacklistStore blacklist,
-    IOptions<CivitaiSettings> options, 
-    ILogger<ImageService> logger)
+public class ImageService(BlacklistStore blacklist, IOptions<CivitaiSettings> options, ILogger<ImageService> logger)
 {
-    // Given a default value to avoid annoying nullability. We assume the UI will always actually hook onto this.
+    private readonly BoundedQueue<ImageModel> _images = new(options.Value.QueryDefaults.Limit ?? 20);
+    
     public Func<int, Task> NewImagesFound { get; set; } = _ => Task.CompletedTask;
-    public BoundedQueue<ImageModel> Images { get; } = new(options.Value.QueryDefaults.Limit ?? 20);
-
-    public async Task EnqueueImages(IEnumerable<ImageModel> images)
+    public IReadOnlyList<ImageModel> Images => _images.AsReadOnly();
+    
+    public async Task Enqueue(IEnumerable<ImageModel> images)
     {
         var found = 0;
-
+        
         foreach (var image in images)
         {
             if (Images.Any(s => s.ImageUrl == image.ImageUrl)) continue;
             if (blacklist.IsBlacklisted(image.Username)) continue;
             
-            Images.Enqueue(image);
+            _images.Enqueue(image);
             
             found++;
         }
@@ -32,5 +30,11 @@ public class ImageService(
 
         // Tell the UI we have new images.
         await NewImagesFound(found);
+    }
+
+    public async Task ClearAndEnqueue(IEnumerable<ImageModel> images)
+    {
+        _images.Clear();
+        await Enqueue(images);
     }
 }
