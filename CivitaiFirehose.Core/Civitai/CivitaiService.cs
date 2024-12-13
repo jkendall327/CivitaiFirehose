@@ -19,6 +19,25 @@ public class CivitaiService(
         
         var response = await client.GetImages(query, ct);
 
+        await EnqueueImages(response);
+    }
+    
+    public async Task<List<ImageModel>> GetAllImagesFromPost(int postId, CancellationToken ct = default)
+    {
+        var query = options.Value.QueryDefaults.Clone();
+        
+        query.PostId = postId;
+        query.Limit = 200;
+        
+        var response = await client.GetImages(query, ct);
+        
+        var images = response.items.Select(ToImageModel);
+
+        return images.ToList();
+    }
+
+    private async Task EnqueueImages(CivitaiResponse response)
+    {
         var found = 0;
 
         foreach (var img in response.items)
@@ -39,20 +58,6 @@ public class CivitaiService(
 
         // Tell the UI we have new images.
         await NewImagesFound(found);
-    }
-    
-    public async Task<List<ImageModel>> GetAllImagesFromPost(int postId, CancellationToken ct = default)
-    {
-        var query = options.Value.QueryDefaults.Clone();
-        
-        query.PostId = postId;
-        query.Limit = 200;
-        
-        var response = await client.GetImages(query, ct);
-        
-        var images = response.items.Select(ToImageModel);
-
-        return images.ToList();
     }
 
     private ImageModel ToImageModel(Item item)
