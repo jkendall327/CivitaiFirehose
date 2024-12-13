@@ -1,8 +1,17 @@
 namespace CivitaiFirehose;
 
-public static class TagExtractor
+public class ImageMapper
 {
-    public static List<string> GetTagsFromResponse(Item item)
+    public ImageModel ToImageModel(Item item)
+    {
+        var tags = GetTagsFromResponse(item);
+            
+        var image = new ImageModel(item.url, item.postId, item.username, tags);
+
+        return image;
+    }
+
+    private static List<string> GetTagsFromResponse(Item item)
     {
         var tags = new HashSet<string>
         {

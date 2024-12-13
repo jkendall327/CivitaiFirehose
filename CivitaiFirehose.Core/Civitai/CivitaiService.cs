@@ -6,6 +6,7 @@ namespace CivitaiFirehose;
 public class CivitaiService(
     CivitaiClient client,
     BlacklistStore blacklist,
+    ImageMapper mapper,
     IOptions<CivitaiSettings> options, 
     ILogger<CivitaiService> logger) : ICivitaiService
 {
@@ -31,7 +32,7 @@ public class CivitaiService(
         
         var response = await client.GetImages(query, ct);
         
-        var images = response.items.Select(ToImageModel);
+        var images = response.items.Select(mapper.ToImageModel);
 
         return images.ToList();
     }
@@ -45,7 +46,7 @@ public class CivitaiService(
             if (Images.Any(s => s.ImageUrl == img.url)) continue;
             if (blacklist.IsBlacklisted(img.username)) continue;
             
-            var image = ToImageModel(img);
+            var image = mapper.ToImageModel(img);
             
             Images.Enqueue(image);
             
@@ -58,14 +59,5 @@ public class CivitaiService(
 
         // Tell the UI we have new images.
         await NewImagesFound(found);
-    }
-
-    private ImageModel ToImageModel(Item item)
-    {
-        var tags = TagExtractor.GetTagsFromResponse(item);
-            
-        var image = new ImageModel(item.url, item.postId, item.username, tags);
-
-        return image;
     }
 }
