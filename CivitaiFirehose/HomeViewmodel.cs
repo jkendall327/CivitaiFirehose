@@ -8,10 +8,11 @@ public sealed class HomeViewmodel(
     JsService jsService,
     HydrusPusher pusher,
     BlacklistStore blacklist,
+    ImageService imageService,
     ChannelWriter<ImageModel> writer,
     ILogger<HomeViewmodel> logger) : IDisposable
 {
-    public IEnumerable<ImageModel> Images => civitaiService.Images;
+    public IEnumerable<ImageModel> Images => imageService.Images;
     public string PageTitle { get; private set; } = "Civitai Firehose";
     private int Unseen { get; set; }
     public int? HighlightedPostId { get; private set; }
@@ -20,7 +21,7 @@ public sealed class HomeViewmodel(
 
     public void OnInitialized()
     {
-        civitaiService.NewImagesFound += SetImages;
+        imageService.NewImagesFound += SetImages;
         pusher.OnStateChanged += NotifyStateChanged;
     }
 
@@ -138,7 +139,7 @@ public sealed class HomeViewmodel(
 
     public void Dispose()
     {
-        civitaiService.NewImagesFound -= SetImages;
+        imageService.NewImagesFound -= SetImages;
         pusher.OnStateChanged -= NotifyStateChanged;
         jsService.Dispose();
     }
