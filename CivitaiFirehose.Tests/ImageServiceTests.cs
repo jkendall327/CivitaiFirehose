@@ -9,7 +9,6 @@ public class ImageServiceTests
 {
     private readonly ImageService _sut;
     private readonly IServiceProvider _serviceProvider;
-    private readonly CivitaiSettings _settings = new();
     
     public ImageServiceTests()
     {
@@ -102,7 +101,7 @@ public class ImageServiceTests
 
         await _sut.Enqueue(images);
 
-        // Based on the limit we set in constructor
+        // Based on the limit set in constructor
         _sut.Images.Should().HaveCount(5);
     }
 }
