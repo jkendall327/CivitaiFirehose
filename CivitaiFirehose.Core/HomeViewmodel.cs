@@ -1,4 +1,5 @@
 using System.Threading.Channels;
+using Microsoft.Extensions.Logging;
 
 namespace CivitaiFirehose;
 
@@ -10,18 +11,22 @@ public sealed class HomeViewmodel(
     ChannelWriter<ImageModel> writer,
     ILogger<HomeViewmodel> logger) : IDisposable
 {
+    // Events
+    public event Func<Task>? StateUpdated;
+    public event Func<string, Task>? TitleUpdated;
+
+    // Bound properties
     public IEnumerable<ImageModel> Images => imageService.Images;
-    public string PageTitle { get; private set; } = "Civitai Firehose";
+    public string PageTitle { get; private set; } = OriginalTitle;
     private int Unseen { get; set; }
     public int? HighlightedPostId { get; private set; }
     public int? ImagesInHighlightedPost { get; set; }
-    public event Func<Task>? StateUpdated;
-    public event Func<string, Task>? TitleUpdated;
     
+    // Private state
     private readonly CancellationTokenSource _timerCancellationToken = new();
-
     private int? _postId;
     private int? _modelId;
+    private const string OriginalTitle = "Civitai Firehose";
     
     public async Task OnInitialized(int? postId = null, int? modelId = null)
     {
@@ -38,6 +43,12 @@ public sealed class HomeViewmodel(
     {
         if (StateUpdated is null) return;
         await StateUpdated();
+    }
+
+    private async Task NotifyTitleChanged(string newTitle)
+    {
+        if (TitleUpdated is null) return;
+        await TitleUpdated(newTitle);
     }
 
     public async Task OnAfterRenderAsync()
@@ -91,10 +102,7 @@ public sealed class HomeViewmodel(
         Unseen += newCount;
         PageTitle = $"Civitai Firehose ({Unseen})";
 
-        if (TitleUpdated is not null)
-        {
-            await TitleUpdated.Invoke(PageTitle);
-        }
+        await NotifyTitleChanged(PageTitle);
     }
 
     public async Task OnTabFocused()
@@ -102,13 +110,9 @@ public sealed class HomeViewmodel(
         logger.LogDebug("Tab focused, clearing any unread notifications");
 
         Unseen = 0;
+        PageTitle = OriginalTitle;
 
-        PageTitle = "Civitai Firehose";
-
-        if (TitleUpdated is not null)
-        {
-            await TitleUpdated.Invoke(PageTitle);
-        }
+        await NotifyTitleChanged(PageTitle);
     }
 
     public async Task OnImageButtonClick(ImageModel image)
