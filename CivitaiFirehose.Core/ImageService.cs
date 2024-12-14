@@ -37,10 +37,4 @@ public sealed class ImageService(BlacklistStore blacklist, IOptions<CivitaiSetti
             await NewImagesFound(found);
         }
     }
-
-    public async Task ClearAndEnqueue(IList<ImageModel> images)
-    {
-        _images.Clear();
-        await Enqueue(images);
-    }
 }

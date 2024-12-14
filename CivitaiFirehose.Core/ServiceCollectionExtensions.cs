@@ -7,13 +7,19 @@ namespace CivitaiFirehose;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddCivitaiServices(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddAppOptions(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<CivitaiSettings>(configuration.GetSection(nameof(CivitaiSettings)));
+        services.Configure<HydrusSettings>(configuration.GetSection(nameof(HydrusSettings)));
+
+        return services;
+    }
+    
+    public static IServiceCollection AddCivitaiServices(this IServiceCollection services)
     {
         var channel = Channel.CreateUnbounded<ImageModel>();
         services.AddSingleton(channel.Writer);
         services.AddSingleton(channel.Reader);
-
-        services.Configure<CivitaiSettings>(configuration.GetSection(nameof(CivitaiSettings)));
         
         services.AddHttpClient<CivitaiClient>();
         services.AddSingleton<ICivitaiService, CivitaiService>();
@@ -26,10 +32,8 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddHydrusServices(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddHydrusServices(this IServiceCollection services)
     {
-        services.Configure<HydrusSettings>(configuration.GetSection(nameof(HydrusSettings)));
-            
         services.AddHttpClient<HydrusClient>((s, c) =>
         {
             var opt = s.GetRequiredService<IOptions<HydrusSettings>>().Value;

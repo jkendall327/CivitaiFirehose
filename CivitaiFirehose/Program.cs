@@ -24,8 +24,9 @@ builder.Host.UseSerilog((context, config) => {
 
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
-builder.Services.AddCivitaiServices(builder.Configuration);
-builder.Services.AddHydrusServices(builder.Configuration);
+builder.Services.AddAppOptions(builder.Configuration);
+builder.Services.AddCivitaiServices();
+builder.Services.AddHydrusServices();
 
 builder.Services.AddHostedService<HydrusPusherBackgroundService>();
 builder.Services.AddScoped<JsService>();
