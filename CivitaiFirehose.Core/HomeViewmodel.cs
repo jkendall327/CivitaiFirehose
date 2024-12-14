@@ -1,5 +1,6 @@
 using System.Threading.Channels;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace CivitaiFirehose;
 
@@ -9,6 +10,7 @@ public sealed class HomeViewmodel(
     BlacklistStore blacklist,
     ImageService imageService,
     ChannelWriter<ImageModel> writer,
+    IOptions<CivitaiSettings> settings,
     ILogger<HomeViewmodel> logger) : IDisposable
 {
     // Events
@@ -60,10 +62,12 @@ public sealed class HomeViewmodel(
             return;
         }
         
-        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(5));
+        using var timer = new PeriodicTimer(settings.Value.PollingPeriod);
         
         while (!_timerCancellationToken.IsCancellationRequested && await timer.WaitForNextTickAsync())
         {
+            logger.LogInformation("Polling Civitai for new images...");
+            
             await PopulateFeed();
             await NotifyStateChanged();
         }
