@@ -26,7 +26,9 @@ builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
 builder.Services.AddCivitaiServices(builder.Configuration);
 builder.Services.AddHydrusServices(builder.Configuration);
-builder.Services.AddWebServices();
+
+builder.Services.AddHostedService<HydrusPusherBackgroundService>();
+builder.Services.AddScoped<JsService>();
 
 builder.Services.AddSystemd();
 

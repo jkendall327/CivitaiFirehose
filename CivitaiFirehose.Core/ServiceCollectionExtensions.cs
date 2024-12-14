@@ -1,4 +1,6 @@
 using System.Threading.Channels;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace CivitaiFirehose;
@@ -36,14 +38,6 @@ public static class ServiceCollectionExtensions
         });
 
         services.AddSingleton<HydrusPusher>();
-        services.AddHostedService<HydrusPusherBackgroundService>();
-
-        return services;
-    }
-
-    public static IServiceCollection AddWebServices(this IServiceCollection services)
-    {
-        services.AddScoped<JsService>();
 
         return services;
     }
