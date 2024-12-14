@@ -2,7 +2,7 @@ using System.Runtime.Serialization;
 
 namespace CivitaiFirehose;
 
-public class CivitaiSettings
+public sealed class CivitaiSettings
 {
     public TimeSpan PollingPeriod { get; init; }
     public List<string> ExcludedCreators { get; set; } = [];

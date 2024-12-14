@@ -2,7 +2,7 @@ using Microsoft.Extensions.Logging;
 
 namespace CivitaiFirehose;
 
-public class HydrusPusher(    
+public sealed class HydrusPusher(    
     IHttpClientFactory factory,
     HydrusClient client,
     ILogger<HydrusPusher> logger)

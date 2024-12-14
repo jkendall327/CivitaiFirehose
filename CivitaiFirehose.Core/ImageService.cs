@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 
 namespace CivitaiFirehose;
 
-public class ImageService(BlacklistStore blacklist, IOptions<CivitaiSettings> options, ILogger<ImageService> logger)
+public sealed class ImageService(BlacklistStore blacklist, IOptions<CivitaiSettings> options, ILogger<ImageService> logger)
 {
     private readonly BoundedQueue<ImageModel> _images = new(options.Value.QueryDefaults.Limit ?? 20);
 

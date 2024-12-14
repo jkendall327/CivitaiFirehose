@@ -1,6 +1,6 @@
 namespace CivitaiFirehose;
 
-public class ImageMapper
+public sealed class ImageMapper
 {
     public ImageModel ToImageModel(Item item)
     {

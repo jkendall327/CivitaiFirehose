@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 
 namespace CivitaiFirehose;
 
-public class CivitaiClient(HttpClient client, ILogger<CivitaiClient> logger)
+public sealed class CivitaiClient(HttpClient client, ILogger<CivitaiClient> logger)
 {
     public async Task<CivitaiResponse> GetImages(CivitaiQuery query, CancellationToken cancellationToken = default)
     {

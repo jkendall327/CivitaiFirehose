@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace CivitaiFirehose;
 
-public class HydrusClient(HttpClient client, ILogger<HydrusClient> logger)
+public sealed class HydrusClient(HttpClient client, ILogger<HydrusClient> logger)
 {
     public async Task VerifyAccess()
     {

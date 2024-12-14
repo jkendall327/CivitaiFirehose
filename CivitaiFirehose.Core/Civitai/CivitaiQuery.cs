@@ -3,7 +3,7 @@ using System.Runtime.Serialization;
 
 namespace CivitaiFirehose;
 
-public class CivitaiQuery
+public sealed class CivitaiQuery
 {
     /// <summary>
     /// The number of results to be returned per page (0-200, default 100)

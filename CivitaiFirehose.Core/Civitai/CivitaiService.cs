@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 
 namespace CivitaiFirehose;
 
-public class CivitaiService(CivitaiClient client, ImageMapper mapper, IOptions<CivitaiSettings> options) : ICivitaiService
+public sealed class CivitaiService(CivitaiClient client, ImageMapper mapper, IOptions<CivitaiSettings> options) : ICivitaiService
 {
     public async Task<List<ImageModel>> GetNewestImages(CancellationToken ct)
     {

@@ -2,7 +2,7 @@ using System.Collections;
 
 namespace CivitaiFirehose;
 
-public class BoundedQueue<T>(int maxSize) : IEnumerable<T>
+public sealed class BoundedQueue<T>(int maxSize) : IEnumerable<T>
 {
     private readonly LinkedList<T> _list = [];
 

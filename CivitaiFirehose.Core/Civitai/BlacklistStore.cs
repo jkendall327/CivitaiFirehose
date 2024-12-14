@@ -2,7 +2,7 @@ using Microsoft.Extensions.Options;
 
 namespace CivitaiFirehose;
 
-public class BlacklistStore(IOptions<CivitaiSettings> options)
+public sealed class BlacklistStore(IOptions<CivitaiSettings> options)
 {
     private readonly HashSet<string> _blacklistedUsers = [..options.Value.ExcludedCreators];
     
