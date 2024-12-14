@@ -2,6 +2,7 @@
 @implements IDisposable
 @rendermode InteractiveServer
 @inject HomeViewmodel Viewmodel
+@inject JsService JsService
 
 <link href="/css/home.css" rel="stylesheet"/>
 
@@ -52,12 +53,20 @@
     {
         await Viewmodel.OnInitialized(PostId, ModelId);
         Viewmodel.StateUpdated += async () => await InvokeAsync(StateHasChanged);
+        Viewmodel.TitleUpdated += ViewmodelOnTitleUpdated;
+    }
+
+    private async Task ViewmodelOnTitleUpdated(string newTitle)
+    {
+        await JsService.SetTabTitle(newTitle);
+        await InvokeAsync(StateHasChanged);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender) return;
-        await Viewmodel.OnAfterRenderAsync(this);
+        await JsService.Initialise(this);
+        await Viewmodel.OnAfterRenderAsync();
     }
     
     [JSInvokable]

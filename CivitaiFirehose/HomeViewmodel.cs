@@ -1,11 +1,9 @@
 using System.Threading.Channels;
-using CivitaiFirehose.Components.Pages;
 
 namespace CivitaiFirehose;
 
 public sealed class HomeViewmodel(
     ICivitaiService civitaiService,
-    JsService jsService,
     HydrusPusher pusher,
     BlacklistStore blacklist,
     ImageService imageService,
@@ -18,6 +16,7 @@ public sealed class HomeViewmodel(
     public int? HighlightedPostId { get; private set; }
     public int? ImagesInHighlightedPost { get; set; }
     public event Func<Task>? StateUpdated;
+    public event Func<string, Task>? TitleUpdated;
     
     private readonly CancellationTokenSource _timerCancellationToken = new();
 
@@ -41,10 +40,8 @@ public sealed class HomeViewmodel(
         await StateUpdated();
     }
 
-    public async Task OnAfterRenderAsync(Home home)
+    public async Task OnAfterRenderAsync()
     {
-        await jsService.Initialise(home);
-        
         if (_postId is not null || _modelId is not null)
         {
             // Only set up the live feed when polling for newest images.
@@ -92,12 +89,12 @@ public sealed class HomeViewmodel(
         logger.LogInformation("Got {ImageCount} new images from service, updating UI", newCount);
         
         Unseen += newCount;
-        
         PageTitle = $"Civitai Firehose ({Unseen})";
-        
-        await jsService.SetTabTitle(PageTitle);
 
-        await NotifyStateChanged();
+        if (TitleUpdated is not null)
+        {
+            await TitleUpdated.Invoke(PageTitle);
+        }
     }
 
     public async Task OnTabFocused()
@@ -108,9 +105,10 @@ public sealed class HomeViewmodel(
 
         PageTitle = "Civitai Firehose";
 
-        await jsService.SetTabTitle(PageTitle);
-
-        await NotifyStateChanged();
+        if (TitleUpdated is not null)
+        {
+            await TitleUpdated.Invoke(PageTitle);
+        }
     }
 
     public async Task OnImageButtonClick(ImageModel image)
@@ -198,7 +196,6 @@ public sealed class HomeViewmodel(
     {
         imageService.NewImagesFound -= OnNewImagesFound;
         pusher.OnStateChanged -= NotifyStateChanged;
-        jsService.Dispose();
         _timerCancellationToken.Dispose();
     }
 }
