@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace CivitaiFirehose;
@@ -7,8 +6,10 @@ public sealed class CivitaiService(CivitaiClient client, ImageMapper mapper, IOp
 {
     public async Task<List<ImageModel>> GetNewestImages(CancellationToken ct)
     {
-        return await GetImages(Set, ct);
+        var images = await GetImages(Set, ct);
 
+        return images.OrderByDescending(s => s.CreatedAt).ToList();
+        
         void Set(CivitaiQuery query)
         {
             query.Sort = SortOrder.Newest;

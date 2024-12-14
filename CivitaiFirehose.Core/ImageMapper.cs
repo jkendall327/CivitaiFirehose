@@ -5,8 +5,10 @@ public sealed class ImageMapper
     public ImageModel ToImageModel(Item item)
     {
         var tags = GetTagsFromResponse(item);
-            
-        var image = new ImageModel(item.url, item.postId, item.username, tags);
+        
+        _ = DateTime.TryParse(item.createdAt, out var createdAt);
+        
+        var image = new ImageModel(item.url, item.postId, item.username, tags, createdAt);
 
         return image;
     }
