@@ -14,7 +14,7 @@
 <HeaderBar/>
 
 <div class="grid-container">
-    @foreach (var image in Viewmodel.Images)
+    @foreach (var image in Viewmodel.Images.OrderByDescending(s => s.CreatedAt))
     {
         <div class="grid-item">
             <div class="image-container @(image.PostId == Viewmodel.HighlightedPostId ? "highlighted" : "")">
