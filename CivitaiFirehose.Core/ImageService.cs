@@ -10,7 +10,7 @@ public sealed class ImageService(BlacklistStore blacklist, IOptions<CivitaiSetti
     public event Func<int, Task>? NewImagesFound;
     public IReadOnlyList<ImageModel> Images => _images.AsReadOnly();
     
-    public async Task Enqueue(IEnumerable<ImageModel> images)
+    public async Task Enqueue(IList<ImageModel> images)
     {
         var found = 0;
         
@@ -26,6 +26,7 @@ public sealed class ImageService(BlacklistStore blacklist, IOptions<CivitaiSetti
 
         if (found is 0)
         {
+            logger.LogInformation("Processed {ImageCount}, but none were new", images.Count);
             return;
         }
 
@@ -37,7 +38,7 @@ public sealed class ImageService(BlacklistStore blacklist, IOptions<CivitaiSetti
         }
     }
 
-    public async Task ClearAndEnqueue(IEnumerable<ImageModel> images)
+    public async Task ClearAndEnqueue(IList<ImageModel> images)
     {
         _images.Clear();
         await Enqueue(images);

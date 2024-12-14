@@ -13,7 +13,7 @@ public sealed class CivitaiClient(HttpClient client, ILogger<CivitaiClient> logg
         
         var uri = QueryHelpers.AddQueryString("https://civitai.com/api/v1/images", opt);
         
-        logger.LogInformation("Getting images with URI {RequestUri}", uri);
+        logger.LogInformation("Getting images from URI {RequestUri}", uri);
         
         var response = await client.GetFromJsonAsync<CivitaiResponse>(uri, cancellationToken);
 

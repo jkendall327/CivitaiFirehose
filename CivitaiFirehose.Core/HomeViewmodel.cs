@@ -129,6 +129,8 @@ public sealed class HomeViewmodel(
     {
         var images = await civitaiService.GetImagesFromPost(image.PostId);
 
+        logger.LogInformation("Got {ImagesInPost} images from {PostId}", images.Count, image.PostId);
+        
         foreach (var imageModel in images)
         {
             await writer.WriteAsync(imageModel);
@@ -137,7 +139,9 @@ public sealed class HomeViewmodel(
 
     public Task OnBlacklistUser(ImageModel image)
     {
+        logger.LogInformation("Blacklisting user {Username}", image.Username);
         blacklist.BlacklistUser(image.Username);
+        
         return Task.CompletedTask;
     }
     

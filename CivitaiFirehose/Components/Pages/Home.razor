@@ -3,6 +3,7 @@
 @rendermode InteractiveServer
 @inject HomeViewmodel Viewmodel
 @inject JsService JsService
+@inject ILogger<Home> Logger
 
 <link href="/css/home.css" rel="stylesheet"/>
 
@@ -52,12 +53,19 @@
     protected override async Task OnInitializedAsync()
     {
         await Viewmodel.OnInitialized(PostId, ModelId);
-        Viewmodel.StateUpdated += async () => await InvokeAsync(StateHasChanged);
+        
+        Viewmodel.StateUpdated += async () =>
+        {
+            Logger.LogDebug("Viewmodel has requested state updated in UI");
+            await InvokeAsync(StateHasChanged);
+        };
+        
         Viewmodel.TitleUpdated += ViewmodelOnTitleUpdated;
     }
 
     private async Task ViewmodelOnTitleUpdated(string newTitle)
     {
+        Logger.LogDebug("Updating UI title to {NewTitle}", newTitle);
         await JsService.SetTabTitle(newTitle);
         await InvokeAsync(StateHasChanged);
     }
