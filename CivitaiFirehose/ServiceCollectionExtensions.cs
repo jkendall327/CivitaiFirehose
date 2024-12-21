@@ -26,6 +26,10 @@ public static class ServiceCollectionExtensions
     
     public static void AddObservability(this WebApplicationBuilder builder)
     {
+        var enabled = builder.Configuration.GetValue<bool>("EnableTelemetry");
+
+        if (!enabled) return;
+        
         builder.Services.AddSingleton<Meters>();
         
         var assembly = typeof(Program).Assembly;
