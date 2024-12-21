@@ -1,5 +1,7 @@
 using CivitaiFirehose;
 using CivitaiFirehose.Components;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Serilog;
 using Serilog.Events;
 
@@ -32,6 +34,14 @@ builder.Services.AddHostedService<HydrusPusherBackgroundService>();
 builder.Services.AddScoped<JsService>();
 
 builder.Services.AddSystemd();
+
+builder.Services.AddOpenTelemetry()
+    .ConfigureResource(resource => resource
+        .AddService(serviceName: "CivitaiFirehose"))
+    .WithTracing(tracing => tracing
+        .AddAspNetCoreInstrumentation()
+        .AddHttpClientInstrumentation()
+        .AddConsoleExporter());
 
 var app = builder.Build();
 
