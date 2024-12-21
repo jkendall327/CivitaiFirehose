@@ -1,3 +1,4 @@
+using System.Reflection;
 using CivitaiFirehose;
 using CivitaiFirehose.Components;
 using OpenTelemetry.Resources;
@@ -35,9 +36,15 @@ builder.Services.AddScoped<JsService>();
 
 builder.Services.AddSystemd();
 
+var assembly = typeof(Program).Assembly;
+
+var version = assembly.GetCustomAttributes(false)
+    .OfType<AssemblyInformationalVersionAttribute>()
+    .Single();
+
 builder.Services.AddOpenTelemetry()
     .ConfigureResource(resource => resource
-        .AddService(serviceName: "CivitaiFirehose"))
+        .AddService(serviceName: "CivitaiFirehose", serviceVersion: version.InformationalVersion))
     .WithTracing(tracing => tracing
         .AddAspNetCoreInstrumentation()
         .AddHttpClientInstrumentation()
