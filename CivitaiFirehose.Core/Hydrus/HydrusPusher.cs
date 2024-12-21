@@ -5,6 +5,7 @@ namespace CivitaiFirehose;
 public sealed class HydrusPusher(    
     IHttpClientFactory factory,
     HydrusClient client,
+    Meters meters,
     ILogger<HydrusPusher> logger)
 {
     public event Func<Task>? OnStateChanged;
@@ -12,6 +13,8 @@ public sealed class HydrusPusher(
     
     public async Task Push(ImageModel image, Dictionary<string, string> services, CancellationToken stoppingToken = default)
     {
+        meters.ReportImagePushed();
+        
         try
         {
             var rawClient = factory.CreateClient();
@@ -35,8 +38,11 @@ public sealed class HydrusPusher(
         catch (Exception ex)
         {
             logger.LogError(ex, "Failed to push image {ImageUrl} to Hydrus", image.ImageUrl);
+            meters.ReportPushFailed();
+            
             image.PushStatus = ImagePushStatus.Failed;
             image.ErrorMessage = ex.Message;
+            
             NotifyStateChanged();
         }
     }
