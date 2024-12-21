@@ -3,7 +3,11 @@ using Microsoft.Extensions.Options;
 
 namespace CivitaiFirehose;
 
-public sealed class ImageService(BlacklistStore blacklist, IOptions<CivitaiSettings> options, ILogger<ImageService> logger)
+public sealed class ImageService(
+    BlacklistStore blacklist, 
+    IOptions<CivitaiSettings> options, 
+    Meters meters,
+    ILogger<ImageService> logger)
 {
     private readonly BoundedQueue<ImageModel> _images = new(options.Value.QueryDefaults.Limit ?? 20);
 
@@ -31,7 +35,7 @@ public sealed class ImageService(BlacklistStore blacklist, IOptions<CivitaiSetti
         }
 
         logger.LogInformation("Found {NewImages} new images", found);
-        Meters.FoundImages.Add(found);
+        meters.ReportNewImages(found);
 
         if (NewImagesFound is not null)
         {

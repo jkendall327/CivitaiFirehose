@@ -26,6 +26,8 @@ public static class ServiceCollectionExtensions
     
     public static void AddObservability(this WebApplicationBuilder builder)
     {
+        builder.Services.AddSingleton<Meters>();
+        
         var assembly = typeof(Program).Assembly;
 
         var version = assembly.GetCustomAttributes(false)
@@ -40,7 +42,7 @@ public static class ServiceCollectionExtensions
                 .AddHttpClientInstrumentation()
                 .AddConsoleExporter())
             .WithMetrics(metrics => metrics
-                .AddMeter("CivitaiFirehose.Metrics")
+                .AddMeter(Meters.MeterName)
                 .AddConsoleExporter());
     }
 }
