@@ -31,6 +31,7 @@ public sealed class ImageService(BlacklistStore blacklist, IOptions<CivitaiSetti
         }
 
         logger.LogInformation("Found {NewImages} new images", found);
+        Meters.FoundImages.Add(found);
 
         if (NewImagesFound is not null)
         {

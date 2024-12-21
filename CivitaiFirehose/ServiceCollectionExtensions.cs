@@ -1,4 +1,5 @@
 using System.Reflection;
+using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
@@ -37,6 +38,9 @@ public static class ServiceCollectionExtensions
             .WithTracing(tracing => tracing
                 .AddAspNetCoreInstrumentation()
                 .AddHttpClientInstrumentation()
+                .AddConsoleExporter())
+            .WithMetrics(metrics => metrics
+                .AddMeter("CivitaiFirehose.Metrics")
                 .AddConsoleExporter());
     }
 }
