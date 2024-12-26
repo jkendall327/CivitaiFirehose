@@ -38,6 +38,8 @@ public sealed class ImageMapper
                 {
                     // Gets rid of some syntax when invoking LORAs in prompts.
                     x = x.Replace("<", string.Empty).Replace(">", string.Empty);
+                    x = x.Trim('(', ')');
+                    
                     return x.Trim();
                 })
                 .Where(s => !string.IsNullOrWhiteSpace(s))
