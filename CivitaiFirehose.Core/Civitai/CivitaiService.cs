@@ -39,6 +39,18 @@ public sealed class CivitaiService(CivitaiClient client, ImageMapper mapper, IOp
         }
     }
 
+    public async Task<List<ImageModel>> GetImagesFromUser(string userName, CancellationToken ct)
+    {
+        // TODO: use the cursor to ensure we get everything.
+        return await GetImages(Set, ct);
+
+        void Set(CivitaiQuery query)
+        {
+            query.Username = userName;
+            query.Limit = 200;
+        }
+    }
+
     private async Task<List<ImageModel>> GetImages(Action<CivitaiQuery> action, CancellationToken ct = default)
     {
         var query = options.Value.QueryDefaults.Clone();
