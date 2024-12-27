@@ -29,6 +29,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ImageService>();
         services.AddScoped<HomeViewmodel>();
         
+        services.AddSingleton<Meters>();
+        
         return services;
     }
 

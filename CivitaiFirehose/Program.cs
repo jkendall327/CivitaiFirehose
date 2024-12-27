@@ -19,7 +19,6 @@ builder.Services.AddCivitaiServices();
 builder.Services.AddHydrusServices();
 builder.Services.AddHostedService<HydrusPusherBackgroundService>();
 builder.Services.AddScoped<JsService>();
-builder.Services.AddSingleton<Meters>();
 
 var app = builder.Build();
 
