@@ -29,6 +29,7 @@ public sealed class HomeViewmodel(
     private int? _postId;
     private int? _modelId;
     private const string OriginalTitle = "Civitai Firehose";
+    private readonly PeriodicTimer _timer = new(settings.Value.PollingPeriod);
     
     public async Task OnInitialized(int? postId = null, int? modelId = null)
     {
@@ -62,9 +63,7 @@ public sealed class HomeViewmodel(
             return;
         }
         
-        using var timer = new PeriodicTimer(settings.Value.PollingPeriod);
-        
-        while (!_timerCancellationToken.IsCancellationRequested && await timer.WaitForNextTickAsync())
+        while (await _timer.WaitForNextTickAsync(_timerCancellationToken.Token))
         {
             logger.LogInformation("Polling Civitai for new images...");
             
@@ -161,53 +160,13 @@ public sealed class HomeViewmodel(
         
         await NotifyStateChanged();
     }
-    
-    public string GetDownloadStatusIcon(ImageModel image)
-    {
-        return image.PushStatus switch
-        {
-            // ⭐
-            ImagePushStatus.NotPushed => "\u2b50",
-            // ⏳
-            ImagePushStatus.Pushing => "\u23f3",
-            // ❌
-            ImagePushStatus.Failed => "\u274c",
-            // ✓
-            ImagePushStatus.Succeeded => "\u2713",
-            var _ => throw new ArgumentOutOfRangeException(nameof(image))
-        };
-    }
-
-    public string GetHighlightStatusIcon()
-    {
-        if (ImagesInHighlightedPost is null)
-        {
-            // 🔍
-            return "\ud83d\udd0d";
-        }
-
-        var icon = ImagesInHighlightedPost switch
-        {
-            0 => throw new ArgumentOutOfRangeException(nameof(ImagesInHighlightedPost)),
-            1 => "1️⃣",
-            2 => "2️⃣",
-            3 => "3️⃣",
-            4 => "4️⃣",
-            5 => "5️⃣",
-            6 => "6️⃣",
-            7 => "7️⃣",
-            8 => "8️⃣",
-            9 => "9️⃣",
-            var _ => "➕"
-        };
-
-        return icon;
-    }
 
     public void Dispose()
     {
         imageService.NewImagesFound -= OnNewImagesFound;
         pusher.OnStateChanged -= NotifyStateChanged;
+
         _timerCancellationToken.Dispose();
+        _timer.Dispose();
     }
 }
