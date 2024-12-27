@@ -1,0 +1,86 @@
+@namespace CivitaiFirehose.Components
+
+<div class="grid-container">
+    @foreach (var image in Images.OrderByDescending(s => s.CreatedAt))
+    {
+        <div class="grid-item">
+            <div class="image-container @(image.PostId == HighlightedPostId ? "highlighted" : "")">
+                <a href="@image.PostUrl" target="_blank">
+                    <img src="@image.ImageUrl" alt="Grid Item">
+                </a>
+                <button class="overlay-button star-button" @onclick="() => OnImageButtonClick.InvokeAsync(image)">
+                    @GetDownloadStatusIcon(image)
+                </button>
+                <button class="overlay-button download-all-button" @onclick="() => OnDownloadAllClick.InvokeAsync(image)">
+                    ⬇️
+                </button>
+                <button class="overlay-button blacklist-button" @onclick="() => OnBlacklistUser.InvokeAsync(image)">
+                    ❌
+                </button>
+                <button class="overlay-button highlight-button" @onclick="() => OnHighlightRelatedImages.InvokeAsync(image)">
+                    @GetHighlightStatusIcon()
+                </button>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public IEnumerable<ImageModel> Images { get; set; } = [];
+
+    [Parameter]
+    public int? HighlightedPostId { get; set; }
+
+    [Parameter]
+    public int? ImagesInHighlightedPost { get; set; }
+
+    [Parameter]
+    public EventCallback<ImageModel> OnImageButtonClick { get; set; }
+
+    [Parameter]
+    public EventCallback<ImageModel> OnDownloadAllClick { get; set; }
+
+    [Parameter]
+    public EventCallback<ImageModel> OnBlacklistUser { get; set; }
+
+    [Parameter]
+    public EventCallback<ImageModel> OnHighlightRelatedImages { get; set; }
+
+    private string GetDownloadStatusIcon(ImageModel image)
+    {
+        return image.PushStatus switch
+        {
+            ImagePushStatus.NotPushed => "\u2b50",  // ⭐
+            ImagePushStatus.Pushing => "\u23f3",    // ⏳
+            ImagePushStatus.Failed => "\u274c",     // ❌
+            ImagePushStatus.Succeeded => "\u2713",  // ✓
+            var _ => throw new ArgumentOutOfRangeException(nameof(image))
+        };
+    }
+
+    private string GetHighlightStatusIcon()
+    {
+        if (ImagesInHighlightedPost is null)
+        {
+            return "\ud83d\udd0d"; // 🔍
+        }
+
+        var icon = ImagesInHighlightedPost switch
+        {
+            0 => throw new ArgumentOutOfRangeException(nameof(ImagesInHighlightedPost)),
+            1 => "1️⃣",
+            2 => "2️⃣",
+            3 => "3️⃣",
+            4 => "4️⃣",
+            5 => "5️⃣",
+            6 => "6️⃣",
+            7 => "7️⃣",
+            8 => "8️⃣",
+            9 => "9️⃣",
+            var _ => "➕"
+        };
+
+        return icon;
+    }
+}

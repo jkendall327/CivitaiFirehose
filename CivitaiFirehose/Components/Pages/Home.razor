@@ -13,30 +13,14 @@
 
 <HeaderBar/>
 
-<div class="grid-container">
-    @foreach (var image in Viewmodel.Images.OrderByDescending(s => s.CreatedAt))
-    {
-        <div class="grid-item">
-            <div class="image-container @(image.PostId == Viewmodel.HighlightedPostId ? "highlighted" : "")">
-                <a href="@image.PostUrl" target="_blank">
-                    <img src="@image.ImageUrl" alt="Grid Item">
-                </a>
-                <button class="overlay-button star-button" @onclick="() => OnImageButtonClick(image)">
-                    @GetDownloadStatusIcon(image)
-                </button>
-                <button class="overlay-button download-all-button" @onclick="() => OnDownloadAllClick(image)">
-                    ⬇️
-                </button>
-                <button class="overlay-button blacklist-button" @onclick="() => OnBlacklistUser(image)">
-                    ❌
-                </button>
-                <button class="overlay-button highlight-button" @onclick="() => OnHighlightRelatedImages(image)">
-                    @GetHighlightStatusIcon()
-                </button>
-            </div>
-        </div>
-    }
-</div>
+<ImageFeed 
+    Images="Viewmodel.Images"
+    HighlightedPostId="Viewmodel.HighlightedPostId"
+    ImagesInHighlightedPost="Viewmodel.ImagesInHighlightedPost"
+    OnImageButtonClick="OnImageButtonClick"
+    OnDownloadAllClick="OnDownloadAllClick"
+    OnBlacklistUser="OnBlacklistUser"
+    OnHighlightRelatedImages="OnHighlightRelatedImages" />
 
 @code {
     [Parameter]
@@ -46,9 +30,6 @@
     [Parameter]
     [SupplyParameterFromQuery]
     public int? ModelId { get; set; }
-    
-    public string GetDownloadStatusIcon(ImageModel image) => Viewmodel.GetDownloadStatusIcon(image);
-    public string GetHighlightStatusIcon() => Viewmodel.GetHighlightStatusIcon();
 
     protected override async Task OnInitializedAsync()
     {
