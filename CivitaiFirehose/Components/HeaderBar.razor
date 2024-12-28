@@ -7,9 +7,9 @@
             <div class="search-input-container">
                 <div class="search-type-select">
                     <select @bind="_selectedSearchType">
-                        <option value="posts">Posts</option>
-                        <option value="models">Models</option>
-                        <option value="users">Users</option>
+                        <option value="postId">Posts</option>
+                        <option value="modelId">Models</option>
+                        <option value="userId">Users</option>
                     </select>
                     <div class="select-arrow">▼</div>
                 </div>
@@ -184,6 +184,8 @@
             return;
         }
 
+        string uri;
+        
         if (_selectedSearchType is "postId" or "modelId")
         {
             if (!int.TryParse(_searchInput, out var id))
@@ -193,15 +195,15 @@
             }
 
             _showError = false;
-            NavigationManager.NavigateTo($"/?{_selectedSearchType}={id}");
+            uri = $"?{_selectedSearchType}={id}";
         }
         else
         {
             _showError = false;
-            
-            // For usernames, just use the raw input
-            NavigationManager.NavigateTo($"/?{_selectedSearchType}={_searchInput}");
+            uri = $"?{_selectedSearchType}={_searchInput}";
         }
+        
+        NavigationManager.NavigateTo(uri);
     }
 
     private void HandleKeyPress(KeyboardEventArgs e)
