@@ -42,4 +42,6 @@ public sealed class ImageService(
             await NewImagesFound(found);
         }
     }
+    
+    public void Clear() => _images.Clear();
 }

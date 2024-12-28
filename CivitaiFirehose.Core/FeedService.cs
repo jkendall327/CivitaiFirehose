@@ -7,7 +7,7 @@ public class FeedService(
     ICivitaiService civitaiService,
     ImageService imageService,
     IOptions<CivitaiSettings> settings,
-    ILogger<FeedService> logger)
+    ILogger<FeedService> logger) : IDisposable
 {
     private readonly PeriodicTimer _timer = new(settings.Value.PollingPeriod);
     private CancellationTokenSource _cts = new();
@@ -24,11 +24,18 @@ public class FeedService(
     private void StopPolling()
     {
         _cts.Cancel();
+        //_timer.Dispose();
+        
         _pollingTask = null;
     }
 
     private async Task PollAsync()
     {
+        imageService.Clear();
+
+        var img = await civitaiService.GetNewestImages();
+        await imageService.Enqueue(img);
+        
         try
         {
             while (!_cts.Token.IsCancellationRequested && await _timer.WaitForNextTickAsync(_cts.Token))
@@ -51,6 +58,8 @@ public class FeedService(
         
         // TODO: clear the image service here before enqueuing?
         var images = await civitaiService.GetImagesFromPost(postId);
+        
+        imageService.Clear();
         await imageService.Enqueue(images);
     }
 
@@ -59,6 +68,8 @@ public class FeedService(
         StopPolling();
         
         var images = await civitaiService.GetImagesFromModel(modelId);
+
+        imageService.Clear();
         await imageService.Enqueue(images);
     }
 
