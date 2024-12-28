@@ -9,8 +9,8 @@ public sealed class HomeViewmodel(
     HydrusPusher pusher,
     BlacklistStore blacklist,
     ImageService imageService,
+    FeedService feedService,
     ChannelWriter<ImageModel> writer,
-    IOptions<CivitaiSettings> settings,
     ILogger<HomeViewmodel> logger) : IDisposable
 {
     // Events
@@ -26,9 +26,6 @@ public sealed class HomeViewmodel(
     
     // Private state
     private const string OriginalTitle = "Civitai Firehose";
-    
-    private readonly CancellationTokenSource _timerCancellationToken = new();
-    private readonly PeriodicTimer _timer = new(settings.Value.PollingPeriod);
     
     private int? _postId;
     private int? _modelId;
@@ -58,24 +55,6 @@ public sealed class HomeViewmodel(
         await TitleUpdated(newTitle);
     }
 
-    public async Task OnAfterRenderAsync()
-    {
-        if (_postId is not null || _modelId is not null)
-        {
-            // Only set up the live feed when polling for newest images.
-            // No point continually polling for new pics when looking at a model or post!
-            return;
-        }
-        
-        while (await _timer.WaitForNextTickAsync(_timerCancellationToken.Token))
-        {
-            logger.LogInformation("Polling Civitai for new images...");
-            
-            await PopulateFeed();
-            await NotifyStateChanged();
-        }
-    }
-
     private async Task PopulateFeed()
     {
         object?[] ids = [_postId, _modelId, _userId];
@@ -87,26 +66,22 @@ public sealed class HomeViewmodel(
         
         if (ids.All(s => s is null))
         {
-            var results = await civitaiService.GetNewestImages();
-            await imageService.Enqueue(results);
+            feedService.StartPollingForNewImages();
         }
 
         if (_postId is not null)
         {
-            var result = await civitaiService.GetImagesFromPost(_postId.Value);
-            await imageService.Enqueue(result);
+            await feedService.LoadPostImages(_postId.Value);
         }
 
         if (_modelId is not null)
         {
-            var result = await civitaiService.GetImagesFromModel(_modelId.Value);
-            await imageService.Enqueue(result);
+            await feedService.LoadModelImages(_modelId.Value);
         }
 
         if (_userId is not null)
         {
-            var result = await civitaiService.GetImagesFromUser(_userId);
-            await imageService.Enqueue(result);
+            throw new NotImplementedException();
         }
     }
 
@@ -177,8 +152,5 @@ public sealed class HomeViewmodel(
     {
         imageService.NewImagesFound -= OnNewImagesFound;
         pusher.OnStateChanged -= NotifyStateChanged;
-
-        _timerCancellationToken.Dispose();
-        _timer.Dispose();
     }
 }

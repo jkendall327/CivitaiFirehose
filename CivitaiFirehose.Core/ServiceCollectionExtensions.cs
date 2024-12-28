@@ -21,15 +21,16 @@ public static class ServiceCollectionExtensions
         services.AddSingleton(channel.Writer);
         services.AddSingleton(channel.Reader);
         
+        services.AddSingleton<Meters>();
+        
         services.AddHttpClient<CivitaiClient>();
         services.AddSingleton<ICivitaiService, CivitaiService>();
         services.AddSingleton<ImageMapper>();
+        services.AddSingleton<FeedService>();
+        services.AddSingleton<BlacklistStore>();
+        services.AddSingleton<ImageService>();
         
-        services.AddScoped<BlacklistStore>();
-        services.AddScoped<ImageService>();
         services.AddScoped<HomeViewmodel>();
-        
-        services.AddSingleton<Meters>();
         
         return services;
     }
