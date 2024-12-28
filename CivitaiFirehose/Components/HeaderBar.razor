@@ -184,25 +184,25 @@
             return;
         }
 
-        string uri;
-        
-        if (_selectedSearchType is "postId" or "modelId")
+        // Simple UI validation for search types that have to be numbers.
+        if (_selectedSearchType is "postId" or "modelId" && !int.TryParse(_searchInput, out var _))
         {
-            if (!int.TryParse(_searchInput, out var id))
-            {
-                _showError = true;
-                return;
-            }
+            _showError = true;
+            return;
+        }
+        
+        _showError = false;
 
-            _showError = false;
-            uri = $"?{_selectedSearchType}={id}";
-        }
-        else
+        var parameters = new Dictionary<string, object?> 
         {
-            _showError = false;
-            uri = $"?{_selectedSearchType}={_searchInput}";
-        }
+            { _selectedSearchType, _searchInput }
+        };
         
+        // We have to use the base URI here or query params will be concatenated
+        // (e.g. ?postId=123&modelId=123)
+        // which is invalid.
+        var uri = NavigationManager.GetUriWithQueryParameters(NavigationManager.BaseUri, parameters);
+    
         NavigationManager.NavigateTo(uri);
     }
 
