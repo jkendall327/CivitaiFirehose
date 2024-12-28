@@ -30,6 +30,9 @@
                 }
             </div>
         </div>
+        <button class="push-all-button" @onclick="HandlePushAll">
+            Push All Images ⬇️
+        </button>
     </div>
 </header>
 
@@ -47,6 +50,11 @@
     private void ShowHelp() => _showHelp = true;
     private void ShowSettings() => _showSettings = true;
     
+    [Parameter]
+    public EventCallback OnPushAllClick { get; set; }
+    
+    private async Task HandlePushAll() => await OnPushAllClick.InvokeAsync();
+
     private void HandleSearch()
     {
         if (string.IsNullOrWhiteSpace(_searchInput))
