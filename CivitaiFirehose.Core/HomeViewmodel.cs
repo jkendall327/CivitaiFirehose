@@ -25,16 +25,20 @@ public sealed class HomeViewmodel(
     public int? ImagesInHighlightedPost { get; set; }
     
     // Private state
-    private readonly CancellationTokenSource _timerCancellationToken = new();
-    private int? _postId;
-    private int? _modelId;
     private const string OriginalTitle = "Civitai Firehose";
+    
+    private readonly CancellationTokenSource _timerCancellationToken = new();
     private readonly PeriodicTimer _timer = new(settings.Value.PollingPeriod);
     
-    public async Task OnInitialized(int? postId = null, int? modelId = null)
+    private int? _postId;
+    private int? _modelId;
+    private string? _userId;
+    
+    public async Task OnInitialized(int? postId = null, int? modelId = null, string? userId = null)
     {
         _postId = postId;
         _modelId = modelId;
+        _userId = userId;
         
         imageService.NewImagesFound += OnNewImagesFound;
         pusher.OnStateChanged += NotifyStateChanged;
@@ -74,12 +78,14 @@ public sealed class HomeViewmodel(
 
     private async Task PopulateFeed()
     {
-        if (_postId is not null && _modelId is not null)
+        object?[] ids = [_postId, _modelId, _userId];
+
+        if (ids.Count(s => s is not null) > 1)
         {
-            throw new InvalidOperationException("Cannot be set to both a post and a model");
+            throw new InvalidOperationException("Viewmodel set to more than one kind of resource");
         }
         
-        if (_postId is null && _modelId is null)
+        if (ids.All(s => s is null))
         {
             var results = await civitaiService.GetNewestImages();
             await imageService.Enqueue(results);
@@ -94,6 +100,12 @@ public sealed class HomeViewmodel(
         if (_modelId is not null)
         {
             var result = await civitaiService.GetImagesFromModel(_modelId.Value);
+            await imageService.Enqueue(result);
+        }
+
+        if (_userId is not null)
+        {
+            var result = await civitaiService.GetImagesFromUser(_userId);
             await imageService.Enqueue(result);
         }
     }

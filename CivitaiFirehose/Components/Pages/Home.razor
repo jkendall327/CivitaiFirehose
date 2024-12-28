@@ -31,10 +31,14 @@
     [Parameter]
     [SupplyParameterFromQuery]
     public int? ModelId { get; set; }
+    
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string? UserId { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        await Viewmodel.OnInitialized(PostId, ModelId);
+        await Viewmodel.OnInitialized(PostId, ModelId, UserId);
         
         Viewmodel.StateUpdated += async () =>
         {

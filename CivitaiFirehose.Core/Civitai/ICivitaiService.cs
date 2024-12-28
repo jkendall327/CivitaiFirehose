@@ -13,4 +13,5 @@ public interface ICivitaiService
     Task<List<ImageModel>> GetImagesFromPost(int postId, CancellationToken ct = default);
 
     Task<List<ImageModel>> GetImagesFromModel(int modelId, int? modelVersionId = null, CancellationToken ct = default);
+    Task<List<ImageModel>> GetImagesFromUser(string userId, CancellationToken ct = default);
 }
