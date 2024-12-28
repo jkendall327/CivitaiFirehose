@@ -70,11 +70,10 @@
         };
         
         // We have to use the base URI here or query params will be concatenated
-        // (e.g. ?postId=123&modelId=123)
-        // which is invalid.
+        // (e.g. ?postId=123&modelId=123), which is invalid.
         var uri = NavigationManager.GetUriWithQueryParameters(NavigationManager.BaseUri, parameters);
     
-        NavigationManager.NavigateTo(uri);
+        NavigationManager.NavigateTo(uri, forceLoad: true);
     }
 
     private void HandleKeyPress(KeyboardEventArgs e)
