@@ -5,27 +5,30 @@
     <div class="header-content">
         <div class="search-container">
             <div class="search-input-container">
+                <div class="search-type-select">
+                    <select @bind="_selectedSearchType">
+                        <option value="posts">Posts</option>
+                        <option value="models">Models</option>
+                        <option value="users">Users</option>
+                    </select>
+                    <div class="select-arrow">▼</div>
+                </div>
                 <input type="text"
                        @bind="_searchInput"
                        @bind:event="oninput"
                        @onkeyup="HandleKeyPress"
-                       placeholder="Enter a Civitai post/model ID..."
+                       placeholder="Enter ID or username..."
                        class="search-input"/>
+                <button class="search-button" @onclick="HandleSearch">Search</button>
                 @if (_showError)
                 {
                     <div class="validation-error">
                         <div class="error-bubble">
-                            Please enter a valid number
+                            Post and model IDs must be numbers
                         </div>
                     </div>
                 }
             </div>
-            <button class="search-button" @onclick="SearchForPosts">Posts</button>
-            <button class="search-button" @onclick="SearchForModels">Models</button>
-        </div>
-        <div class="header-buttons">
-            <button class="header-button" @onclick="ShowSettings">Settings</button>
-            <button class="header-button" @onclick="ShowHelp">Help</button>
         </div>
     </div>
 </header>
@@ -54,8 +57,43 @@
 
     .search-container {
         display: flex;
-        gap: 0.25rem;
         width: 400px;
+    }
+
+    .search-input-container {
+        position: relative;
+        display: flex;
+        width: 100%;
+        gap: 0.25rem;
+    }
+
+    .search-type-select {
+        position: relative;
+        width: 100px;
+    }
+
+    .search-type-select select {
+        width: 100%;
+        height: 1.8rem;
+        padding: 0.25rem 0.5rem;
+        padding-right: 1.5rem;
+        border: none;
+        border-radius: 3px;
+        font-size: 0.9rem;
+        background-color: #333;
+        color: white;
+        appearance: none;
+        cursor: pointer;
+    }
+
+    .select-arrow {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #999;
+        pointer-events: none;
+        font-size: 0.8rem;
     }
 
     .search-input {
@@ -84,36 +122,13 @@
         color: white;
     }
 
-    .header-buttons {
-        position: absolute;
-        right: 0;
-        display: flex;
-        gap: 0.5rem;
-    }
-
-    .header-button {
-        padding: 0.25rem 0.75rem;
-        height: 1.8rem;
-        border: none;
-        border-radius: 3px;
-        cursor: pointer;
-        font-size: 0.9rem;
-        background-color: #444;
-        color: white;
-    }
-
-    .header-button:hover, .search-button:hover {
+    .search-button:hover {
         filter: brightness(1.1);
     }
 
-    .search-input:focus {
+    .search-input:focus, .search-type-select select:focus {
         outline: none;
         background-color: #404040;
-    }
-
-    .search-input-container {
-        position: relative;
-        flex: 1;
     }
 
     .validation-error {
@@ -153,6 +168,7 @@
 
 @code {
     private string _searchInput = "";
+    private string _selectedSearchType = "postId";
     
     private bool _showHelp;
     private bool _showSettings;
@@ -182,13 +198,40 @@
             _showError = true;
         }
     }
+    
+    private void HandleSearch()
+    {
+        if (string.IsNullOrWhiteSpace(_searchInput))
+        {
+            _showError = false;
+            return;
+        }
+
+        if (_selectedSearchType is "postId" or "modelId")
+        {
+            if (!int.TryParse(_searchInput, out var id))
+            {
+                _showError = true;
+                return;
+            }
+
+            _showError = false;
+            NavigationManager.NavigateTo($"/?{_selectedSearchType}={id}");
+        }
+        else
+        {
+            _showError = false;
+            
+            // For usernames, just use the raw input
+            NavigationManager.NavigateTo($"/?{_selectedSearchType}={_searchInput}");
+        }
+    }
 
     private void HandleKeyPress(KeyboardEventArgs e)
     {
-        // TODO: is there a sensible way to have keyboard shortcuts for both posts and models?
         if (e.Key == "Enter")
         {
-            SearchForPosts();
+            HandleSearch();
         }
     }
 }
