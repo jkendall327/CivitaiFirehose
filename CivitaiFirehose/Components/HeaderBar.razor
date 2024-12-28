@@ -4,12 +4,22 @@
 <header class="header">
     <div class="header-content">
         <div class="search-container">
-            <input type="text"
-                   @bind="_searchInput"
-                   @bind:event="oninput"
-                   @onkeyup="HandleKeyPress"
-                   placeholder="Enter a Civitai post/model ID..."
-                   class="search-input"/>
+            <div class="search-input-container">
+                <input type="text"
+                       @bind="_searchInput"
+                       @bind:event="oninput"
+                       @onkeyup="HandleKeyPress"
+                       placeholder="Enter a Civitai post/model ID..."
+                       class="search-input"/>
+                @if (_showError)
+                {
+                    <div class="validation-error">
+                        <div class="error-bubble">
+                            Please enter a valid number
+                        </div>
+                    </div>
+                }
+            </div>
             <button class="search-button" @onclick="SearchForPosts">Posts</button>
             <button class="search-button" @onclick="SearchForModels">Models</button>
         </div>
@@ -100,12 +110,53 @@
         outline: none;
         background-color: #404040;
     }
+
+    .search-input-container {
+        position: relative;
+        flex: 1;
+    }
+
+    .validation-error {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        margin-top: 4px;
+        z-index: 10;
+    }
+
+    .error-bubble {
+        background-color: rgba(40, 40, 40, 0.95);
+        color: #ff6b6b;
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 107, 107, 0.3);
+        max-width: fit-content;
+        position: relative;
+    }
+
+    .error-bubble::before {
+        content: '';
+        position: absolute;
+        top: -5px;
+        left: 10px;
+        width: 10px;
+        height: 10px;
+        background-color: rgba(40, 40, 40, 0.95);
+        transform: rotate(45deg);
+        border-left: 1px solid rgba(255, 107, 107, 0.3);
+        border-top: 1px solid rgba(255, 107, 107, 0.3);
+    }
 </style>
 
 @code {
     private string _searchInput = "";
+    
     private bool _showHelp;
     private bool _showSettings;
+    private bool _showError;
 
     private void ShowHelp() => _showHelp = true;
     private void ShowSettings() => _showSettings = true;
@@ -115,11 +166,20 @@
 
     private void Search(string urlQuery)
     {
-        if (string.IsNullOrWhiteSpace(_searchInput)) return;
+        if (string.IsNullOrWhiteSpace(_searchInput))
+        {
+            _showError = false;
+            return;
+        }
 
         if (int.TryParse(_searchInput, out var id))
         {
-            NavigationManager.NavigateTo($"/?{urlQuery}={id}", forceLoad: true);
+            _showError = false;
+            NavigationManager.NavigateTo($"/?{urlQuery}={id}");
+        }
+        else
+        {
+            _showError = true;
         }
     }
 
