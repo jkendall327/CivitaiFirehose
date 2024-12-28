@@ -12,7 +12,7 @@
     <PageTitle>@Viewmodel.PageTitle</PageTitle>
 </HeadContent>
 
-<HeaderBar/>
+<HeaderBar OnPushAllClick="OnPushAllClick"/>
 
 <ImageFeed 
     Images="Viewmodel.Images"
@@ -48,6 +48,8 @@
         
         Viewmodel.TitleUpdated += ViewmodelOnTitleUpdated;
     }
+    
+    private async Task OnPushAllClick() => await Viewmodel.OnPushAllClick();
 
     private async Task ViewmodelOnTitleUpdated(string newTitle)
     {

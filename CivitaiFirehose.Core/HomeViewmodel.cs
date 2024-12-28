@@ -104,6 +104,16 @@ public sealed class HomeViewmodel(
 
         await NotifyTitleChanged(PageTitle);
     }
+    
+    public async Task OnPushAllClick()
+    {
+        logger.LogInformation("Pushing all visible images to Hydrus");
+    
+        foreach (var image in Images)
+        {
+            await writer.WriteAsync(image);
+        }
+    }
 
     public async Task OnImageButtonClick(ImageModel image)
     {
