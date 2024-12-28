@@ -119,7 +119,7 @@
 
         if (int.TryParse(_searchInput, out var id))
         {
-            NavigationManager.NavigateTo($"/?{urlQuery}={id}");
+            NavigationManager.NavigateTo($"/?{urlQuery}={id}", forceLoad: true);
         }
     }
 
