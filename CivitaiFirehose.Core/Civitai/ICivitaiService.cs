@@ -1,5 +1,8 @@
 namespace CivitaiFirehose;
 
+/// <summary>
+/// Encapsulates getting images from Civitai specifically, i.e. generating query URLs to pass to the HTTP layer. 
+/// </summary>
 public interface ICivitaiService
 {
     /// <summary>

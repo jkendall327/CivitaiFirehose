@@ -4,6 +4,9 @@ using Microsoft.Extensions.Options;
 
 namespace CivitaiFirehose;
 
+/// <summary>
+/// Encapsulates the Blazor-agnostic functionality for the main screen.
+/// </summary>
 public sealed class HomeViewmodel(
     ICivitaiService civitaiService,
     HydrusPusher pusher,
@@ -96,7 +99,7 @@ public sealed class HomeViewmodel(
         await NotifyTitleChanged(PageTitle);
     }
     
-    public async Task OnPushAllClick()
+    public async Task OnPushAll()
     {
         logger.LogInformation("Pushing all visible images to Hydrus");
     
@@ -106,13 +109,13 @@ public sealed class HomeViewmodel(
         }
     }
 
-    public async Task OnImageButtonClick(ImageModel image)
+    public async Task OnPushImage(ImageModel image)
     {
         logger.LogInformation("Sending {ImageUrl} to Hydrus service", image.ImageUrl);
         await writer.WriteAsync(image);
     }
 
-    public async Task OnDownloadAllClick(ImageModel image)
+    public async Task OnPushPost(ImageModel image)
     {
         var images = await civitaiService.GetImagesFromPost(image.PostId);
 

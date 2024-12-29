@@ -3,6 +3,10 @@ using Microsoft.Extensions.Options;
 
 namespace CivitaiFirehose;
 
+/// <summary>
+/// Encapsulates the lifecycle concerns for populating the image feed.
+/// Specifically, it handles switching between live-update polling and static one-and-done scraping.
+/// </summary>
 public sealed class FeedService(
     ICivitaiService civitaiService,
     ImageService imageService,

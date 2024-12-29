@@ -3,6 +3,10 @@ using Microsoft.Extensions.Options;
 
 namespace CivitaiFirehose;
 
+/// <summary>
+/// Encapsulates storage for the currently-loaded images.
+/// Ensures images are added in the right order, aren't duplicated, and aren't on the username blacklist.
+/// </summary>
 public sealed class ImageService(
     BlacklistStore blacklist, 
     IOptions<CivitaiSettings> options, 

@@ -5,6 +5,9 @@ using Microsoft.Extensions.Logging;
 
 namespace CivitaiFirehose;
 
+/// <summary>
+/// Encapsulates making actual HTTP requests to the Civitai API.
+/// </summary>
 public sealed class CivitaiClient(HttpClient client, ILogger<CivitaiClient> logger)
 {
     public async Task<CivitaiResponse> GetImages(CivitaiQuery query, CancellationToken cancellationToken = default)

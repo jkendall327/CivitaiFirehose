@@ -56,7 +56,7 @@
         await base.OnParametersSetAsync();
     }
 
-    private async Task OnPushAllClick() => await Viewmodel.OnPushAllClick();
+    private async Task OnPushAllClick() => await Viewmodel.OnPushAll();
 
     private async Task ViewmodelOnTitleUpdated(string newTitle)
     {
@@ -74,8 +74,8 @@
     [JSInvokable]
     public async Task OnTabFocused() => await Viewmodel.OnTabFocused();
 
-    private async Task OnImageButtonClick(ImageModel image) => await Viewmodel.OnImageButtonClick(image);
-    private async Task OnDownloadAllClick(ImageModel image) => await Viewmodel.OnDownloadAllClick(image);
+    private async Task OnImageButtonClick(ImageModel image) => await Viewmodel.OnPushImage(image);
+    private async Task OnDownloadAllClick(ImageModel image) => await Viewmodel.OnPushPost(image);
     private async Task OnBlacklistUser(ImageModel image) => await Viewmodel.OnBlacklistUser(image);
     private Task OnHighlightRelatedImages(ImageModel image) => Viewmodel.OnHighlightRelatedImages(image);
 
