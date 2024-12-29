@@ -3,6 +3,9 @@
 
 <header class="header">
     <div class="header-content">
+        <button class="push-all-button" @onclick="GoHome">
+            Home
+        </button>
         <div class="search-container">
             <div class="search-input-container">
                 <div class="search-type-select">
@@ -90,5 +93,10 @@
         {
             HandleSearch();
         }
+    }
+
+    private void GoHome()
+    {
+        NavigationManager.NavigateTo(NavigationManager.BaseUri, forceLoad: true);
     }
 }
