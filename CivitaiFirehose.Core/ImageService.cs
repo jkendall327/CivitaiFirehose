@@ -49,7 +49,7 @@ public sealed class ImageService(
 
     public async Task ClearAndEnqueue(IList<ImageModel> images)
     {
-        images.Clear();
+        _images.Clear();
         await Enqueue(images);
     }
     
