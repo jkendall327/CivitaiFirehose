@@ -37,7 +37,7 @@ public sealed class HomeViewmodel(
         pusher.OnStateChanged += NotifyStateChanged;
     }
     
-    public async Task Foo(int? postId = null, int? modelId = null, string? userId = null)
+    public async Task UpdateFeedSource(int? postId = null, int? modelId = null, string? userId = null)
     {
         _postId = postId;
         _modelId = modelId;

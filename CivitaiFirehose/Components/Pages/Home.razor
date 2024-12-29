@@ -52,7 +52,7 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        await Viewmodel.Foo(PostId, ModelId, UserId);
+        await Viewmodel.UpdateFeedSource(PostId, ModelId, UserId);
         await base.OnParametersSetAsync();
     }
 
