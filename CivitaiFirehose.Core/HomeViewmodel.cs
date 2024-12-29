@@ -60,7 +60,7 @@ public sealed class HomeViewmodel(
 
         if (userId is not null)
         {
-            throw new NotImplementedException();
+            await feedService.LoadUserImages(userId);
         }
     }
 

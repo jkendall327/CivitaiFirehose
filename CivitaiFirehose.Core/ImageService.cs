@@ -42,6 +42,12 @@ public sealed class ImageService(
             await NewImagesFound(found);
         }
     }
+
+    public async Task ClearAndEnqueue(IList<ImageModel> images)
+    {
+        images.Clear();
+        await Enqueue(images);
+    }
     
     public void Clear() => _images.Clear();
 }

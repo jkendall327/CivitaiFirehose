@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 
 namespace CivitaiFirehose;
 
-public class FeedService(
+public sealed class FeedService(
     ICivitaiService civitaiService,
     ImageService imageService,
     IOptions<CivitaiSettings> settings,
@@ -24,17 +24,13 @@ public class FeedService(
     private void StopPolling()
     {
         _cts.Cancel();
-        //_timer.Dispose();
-        
         _pollingTask = null;
     }
 
     private async Task PollAsync()
     {
-        imageService.Clear();
-
         var img = await civitaiService.GetNewestImages();
-        await imageService.Enqueue(img);
+        await imageService.ClearAndEnqueue(img);
         
         try
         {
@@ -56,11 +52,9 @@ public class FeedService(
     {
         StopPolling();
         
-        // TODO: clear the image service here before enqueuing?
         var images = await civitaiService.GetImagesFromPost(postId);
         
-        imageService.Clear();
-        await imageService.Enqueue(images);
+        await imageService.ClearAndEnqueue(images);
     }
 
     public async Task LoadModelImages(int modelId)
@@ -69,8 +63,16 @@ public class FeedService(
         
         var images = await civitaiService.GetImagesFromModel(modelId);
 
-        imageService.Clear();
-        await imageService.Enqueue(images);
+        await imageService.ClearAndEnqueue(images);
+    }
+
+    public async Task LoadUserImages(string userId)
+    {
+        StopPolling();
+        
+        var images = await civitaiService.GetImagesFromUser(userId);
+        
+        await imageService.ClearAndEnqueue(images);
     }
 
     public void Dispose()
