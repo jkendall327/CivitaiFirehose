@@ -84,7 +84,8 @@
         // (e.g. ?postId=123&modelId=123), which is invalid.
         var uri = NavigationManager.GetUriWithQueryParameters(NavigationManager.BaseUri, parameters);
     
-        NavigationManager.NavigateTo(uri, forceLoad: true);
+        NavigationManager.NavigateTo(uri, forceLoad: false);
+        StateHasChanged();
     }
 
     private void HandleKeyPress(KeyboardEventArgs e)
@@ -97,6 +98,7 @@
 
     private void GoHome()
     {
-        NavigationManager.NavigateTo(NavigationManager.BaseUri, forceLoad: true);
+        NavigationManager.NavigateTo(NavigationManager.BaseUri, forceLoad: false);
+        StateHasChanged();
     }
 }

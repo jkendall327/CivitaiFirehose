@@ -31,15 +31,18 @@ public sealed class HomeViewmodel(
     private int? _modelId;
     private string? _userId;
     
-    public async Task OnInitialized(int? postId = null, int? modelId = null, string? userId = null)
+    public void OnInitialized()
+    {
+        imageService.NewImagesFound += OnNewImagesFound;
+        pusher.OnStateChanged += NotifyStateChanged;
+    }
+    
+    public async Task Foo(int? postId = null, int? modelId = null, string? userId = null)
     {
         _postId = postId;
         _modelId = modelId;
         _userId = userId;
         
-        imageService.NewImagesFound += OnNewImagesFound;
-        pusher.OnStateChanged += NotifyStateChanged;
-
         await PopulateFeed();
     }
 

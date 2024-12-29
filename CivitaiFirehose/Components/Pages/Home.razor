@@ -37,9 +37,9 @@
     [SupplyParameterFromQuery]
     public string? UserId { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        await Viewmodel.OnInitialized(PostId, ModelId, UserId);
+        Viewmodel.OnInitialized();
         
         Viewmodel.StateUpdated += async () =>
         {
@@ -49,7 +49,13 @@
         
         Viewmodel.TitleUpdated += ViewmodelOnTitleUpdated;
     }
-    
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await Viewmodel.Foo(PostId, ModelId, UserId);
+        await base.OnParametersSetAsync();
+    }
+
     private async Task OnPushAllClick() => await Viewmodel.OnPushAllClick();
 
     private async Task ViewmodelOnTitleUpdated(string newTitle)
