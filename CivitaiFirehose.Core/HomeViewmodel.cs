@@ -27,10 +27,6 @@ public sealed class HomeViewmodel(
     // Private state
     private const string OriginalTitle = "Civitai Firehose";
     
-    private int? _postId;
-    private int? _modelId;
-    private string? _userId;
-    
     public void OnInitialized()
     {
         imageService.NewImagesFound += OnNewImagesFound;
@@ -39,11 +35,33 @@ public sealed class HomeViewmodel(
     
     public async Task UpdateFeedSource(int? postId = null, int? modelId = null, string? userId = null)
     {
-        _postId = postId;
-        _modelId = modelId;
-        _userId = userId;
+        object?[] ids = [postId, modelId, userId];
+
+        if (ids.Count(s => s is not null) > 1)
+        {
+            throw new InvalidOperationException("Feed set to more than one kind of resource");
+        }
         
-        await PopulateFeed();
+        // Default behaviour when no explicit source is set.
+        if (ids.All(s => s is null))
+        {
+            feedService.StartPollingForNewImages();
+        }
+
+        if (postId is not null)
+        {
+            await feedService.LoadPostImages(postId.Value);
+        }
+
+        if (modelId is not null)
+        {
+            await feedService.LoadModelImages(modelId.Value);
+        }
+
+        if (userId is not null)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     private async Task NotifyStateChanged()
@@ -56,36 +74,6 @@ public sealed class HomeViewmodel(
     {
         if (TitleUpdated is null) return;
         await TitleUpdated(newTitle);
-    }
-
-    private async Task PopulateFeed()
-    {
-        object?[] ids = [_postId, _modelId, _userId];
-
-        if (ids.Count(s => s is not null) > 1)
-        {
-            throw new InvalidOperationException("Viewmodel set to more than one kind of resource");
-        }
-        
-        if (ids.All(s => s is null))
-        {
-            feedService.StartPollingForNewImages();
-        }
-
-        if (_postId is not null)
-        {
-            await feedService.LoadPostImages(_postId.Value);
-        }
-
-        if (_modelId is not null)
-        {
-            await feedService.LoadModelImages(_modelId.Value);
-        }
-
-        if (_userId is not null)
-        {
-            throw new NotImplementedException();
-        }
     }
 
     private async Task OnNewImagesFound(int newCount)
