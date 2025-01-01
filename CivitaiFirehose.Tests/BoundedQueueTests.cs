@@ -2,7 +2,7 @@
 
 namespace CivitaiFirehose.Tests;
 
-public class BoundedQueueTests
+public sealed class BoundedQueueTests
 {
     [Fact]
     public void NewItemsAppearFirst()

@@ -2,7 +2,7 @@ using System.Net;
 
 namespace CivitaiFirehose.Tests;
 
-public class TestHttpMessageHandler() : HttpMessageHandler
+public sealed class TestHttpMessageHandler() : HttpMessageHandler
 {
     public string Response { get; set; } = "{}";
     

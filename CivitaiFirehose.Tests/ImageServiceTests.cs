@@ -5,7 +5,7 @@ using NSubstitute;
 
 namespace CivitaiFirehose.Tests;
 
-public class ImageServiceTests
+public sealed class ImageServiceTests
 {
     private readonly ImageService _sut;
     private readonly IServiceProvider _serviceProvider;

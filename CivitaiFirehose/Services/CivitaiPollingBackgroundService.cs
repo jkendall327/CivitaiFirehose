@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 
 namespace CivitaiFirehose;
 
-public class CivitaiPollingBackgroundService(
+public sealed class CivitaiPollingBackgroundService(
     ICivitaiService civitaiService,
     ImageService imageService,
     IOptions<CivitaiSettings> options,

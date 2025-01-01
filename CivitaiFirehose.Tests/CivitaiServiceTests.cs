@@ -5,7 +5,7 @@ using NSubstitute;
 
 namespace CivitaiFirehose.Tests;
 
-public class CivitaiServiceTests
+public sealed class CivitaiServiceTests
 {
     private readonly ICivitaiService _sut;
     private readonly TestHttpMessageHandler _handler;
