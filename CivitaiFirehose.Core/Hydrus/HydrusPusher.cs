@@ -44,6 +44,8 @@ public sealed class HydrusPusher(
             image.ErrorMessage = ex.Message;
             
             NotifyStateChanged();
+
+            throw;
         }
     }
 }

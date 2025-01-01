@@ -2,6 +2,7 @@ namespace CivitaiFirehose;
 
 public sealed class HydrusSettings
 {
-    public string BaseUrl { get; set; }
-    public string ApiKey { get; set; }
+    public required string BaseUrl { get; init; }
+    public required string ApiKey { get; init; }
+    public TimeSpan AvailabilityWaitPeriod { get; init; }
 }
