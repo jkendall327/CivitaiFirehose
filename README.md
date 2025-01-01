@@ -1,25 +1,47 @@
 # Civitai Firehose
 
-This is a fairly simple Blazor app I made primarily for my own use, but decided to make public.
+This is a fairly simple Blazor app I made primarily for my own use.
 
-Civitai is the main place where people are sharing AI images they've generated nowadays.
-I have a habit of trawling the feed for newly-posted images.
-I find something fascinating in looking at the endless stream of ephemeral Content produced by random people online when they're given access to heinously powerful tools.
+[Civitai](https://civitai.com) is the main place where people are sharing AI images nowadays.
+I enjoy trawling its feed for newly-posted images -- 
+there is something fascinating in the endless stream of ephemeral Content produced by the gestalt consciousness of the internet.
 
-It was a pain manually saving all the cool pictures I saw, so I made this app to serve as a dashboard/infinite stream of content for me. 
+I made this app:
+- as a live-updating dashboard/infinite stream of content
+- to get hands-on experience with the dirty bits of Blazor
+- for fun.
 
-I typically organise my media in an app called the Hydrus Network, so I additionally added some functionality to quickly
-send interesting images to it for download via its built-in REST API.
+## Hydrus
+I use [the Hydrus Network](https://hydrusnetwork.github.io/hydrus/index.html) to organise my media.
+It exposes a REST API for importing material, so I've added features for quickly pushing images en masse from the firehose
+to your local Hydrus instance.
 
-At some point I will try to document my design choices here, but most of the choices should be fairly unsurprising.
+This functionality is primarily accessed by the icons seen when hovering over an image in the feed.
+You can use the 'help' button in the UI for a reference on what each button does.
+
+## Usage
+
+1. `git clone` to your machine
+2. `dotnet run ./CivitaiFirehose/CivitaiFirehose.csproj`
+
+Logs are automatically output to `logs` in the binary's working directory.
 
 I make no claim this code will be useful to anyone else, but you're welcome to use it if you would like to.
 
-Compilation should be as simple as 'dotnet run'.
+## Configuration
 
-## TODO
-- Let users enter own search term/query for more specialised live hose
-- Let users change sort mode etc. in UI, rather than editing config
-- Provide feedback if push-to-Hydrus fails
-- Add better logging
-- Add tests and general robustness
+Configuration is housed in `appsettings.json`.
+
+- `EnableTelemetry`: enables OpenTelemetry data collection. Currently this is only exported to the console.
+- CivitaiSettings
+  - PollingPeriod: how often the app will scrape Civitai's new-images feed.
+  - ExcludedCreators: usernames in this list will be excluded from your new-images feed.
+  - QueryDefaults: these properties are automatically applied to your HTTP calls to Civitai's API. Check [this documentation](https://github.com/civitai/civitai/wiki/REST-API-Reference#get-apiv1images) for information on what you can specify here.
+- HydrusSettings
+  - BaseUrl: where your Hydrus instance is running.
+  - ApiKey: the key used to authenticate with Hydrus's REST API.
+  - AvailabilityWaitPeriod: how long the app will wait before checking if your Hydrus instance has become available.
+
+## Contributions
+
+Any changes and comments are welcome. Please keep in mind that this is just a personal project, though.
