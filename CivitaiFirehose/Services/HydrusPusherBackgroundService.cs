@@ -16,6 +16,8 @@ public sealed class HydrusPusherBackgroundService(
         
         await foreach (var image in channel.ReadAllAsync(stoppingToken))
         {
+            logger.LogDebug("Got push request: {@Request}", image);
+            
             try
             {
                 await pusher.Push(image, services, stoppingToken);
@@ -27,6 +29,8 @@ public sealed class HydrusPusherBackgroundService(
                 services = await AwaitHydrusAvailable(stoppingToken);
             }
         }
+        
+        logger.LogWarning("Channel exit");
     }
 
     private async Task<Dictionary<string, string>> AwaitHydrusAvailable(CancellationToken cancellationToken = default)
@@ -39,7 +43,11 @@ public sealed class HydrusPusherBackgroundService(
             {
                 await client.VerifyAccess(cancellationToken);
                 
+                logger.LogInformation("Hydrus available, getting services");
+                
                 var services = await client.GetServices(cancellationToken);
+                
+                logger.LogInformation("Got services: {@Services}", services);
                 
                 return services;
             }
