@@ -1,3 +1,4 @@
+using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 
 namespace CivitaiFirehose;
@@ -41,3 +42,31 @@ public record Metadata(
     string nextCursor,
     string nextPage
 );
+
+public enum NsfwFilter
+{
+    None,
+    Soft,
+    Mature,
+    X
+}
+
+public enum SortOrder
+{
+    [EnumMember(Value = "Most Reactions")]
+    MostReactions,
+    [EnumMember(Value = "Most Comments")]
+    MostComments,
+    [EnumMember(Value = "Newest")]
+    Newest
+}
+
+public enum TimePeriod
+{
+    [EnumMember(Value = "AllTime")]
+    AllTime,
+    Year,
+    Month,
+    Week,
+    Day
+}

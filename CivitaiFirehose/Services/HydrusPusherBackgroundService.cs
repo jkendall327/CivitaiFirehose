@@ -12,6 +12,14 @@ public sealed class HydrusPusherBackgroundService(
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        var config = settings.Value;
+        
+        if (string.IsNullOrEmpty(config.BaseUrl) || string.IsNullOrEmpty(config.ApiKey))
+        {
+            logger.LogInformation("No URL or API key specified for Hydrus; disabling background service");
+            return;
+        }
+        
         var services = await AwaitHydrusAvailable(stoppingToken);
         
         await foreach (var image in channel.ReadAllAsync(stoppingToken))
