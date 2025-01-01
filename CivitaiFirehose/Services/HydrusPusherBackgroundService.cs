@@ -37,9 +37,9 @@ public sealed class HydrusPusherBackgroundService(
         {
             try
             {
-                await client.VerifyAccess();
+                await client.VerifyAccess(cancellationToken);
                 
-                var services = await client.GetServices();
+                var services = await client.GetServices(cancellationToken);
                 
                 return services;
             }

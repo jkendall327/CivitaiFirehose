@@ -5,11 +5,11 @@ using Microsoft.Extensions.Logging;
 
 namespace CivitaiFirehose;
 
-public sealed class HydrusClient(HttpClient client, ILogger<HydrusClient> logger)
+public sealed class HydrusClient(HttpClient client)
 {
-    public async Task VerifyAccess()
+    public async Task VerifyAccess(CancellationToken cancellationToken = default)
     {
-        var response = await client.GetAsync("verify_access_key");
+        var response = await client.GetAsync("verify_access_key", cancellationToken);
 
         response.EnsureSuccessStatusCode();
     }
@@ -22,13 +22,13 @@ public sealed class HydrusClient(HttpClient client, ILogger<HydrusClient> logger
         [JsonPropertyName("star_shape")] public string? StarShape { get; set; }
     }
 
-    public async Task<Dictionary<string, string>> GetServices()
+    public async Task<Dictionary<string, string>> GetServices(CancellationToken cancellationToken = default)
     {
-        var response = await client.GetAsync("get_services");
+        var response = await client.GetAsync("get_services", cancellationToken);
 
         response.EnsureSuccessStatusCode();
 
-        var body = await response.Content.ReadAsStringAsync();
+        var body = await response.Content.ReadAsStringAsync(cancellationToken);
 
         using var document = JsonDocument.Parse(body);
         var root = document.RootElement;
@@ -40,34 +40,35 @@ public sealed class HydrusClient(HttpClient client, ILogger<HydrusClient> logger
 
     private record ImportImageResult(int Status, string Hash, string Note);
 
-    public async Task<string> SendImageToHydrus(byte[] bytes)
+    public async Task<string> SendImageToHydrus(byte[] bytes, CancellationToken cancellationToken = default)
     {
         client.DefaultRequestHeaders.Accept.Add(new("application/octet-stream"));
         var byteContent = new ByteArrayContent(bytes);
         byteContent.Headers.ContentType = new("application/octet-stream");
 
-        var response = await client.PostAsync("add_files/add_file", byteContent);
+        var response = await client.PostAsync("add_files/add_file", byteContent, cancellationToken);
 
         response.EnsureSuccessStatusCode();
 
-        var result = await response.Content.ReadFromJsonAsync<ImportImageResult>();
+        var result = await response.Content.ReadFromJsonAsync<ImportImageResult>(cancellationToken: cancellationToken);
 
         return result!.Hash;
     }
 
-    public async Task AssociateUrlWithImage(string hash, IEnumerable<string> urls)
+    public async Task AssociateUrlWithImage(string hash, IEnumerable<string> urls, CancellationToken cancellationToken = default)
     {
         var response = await client.PostAsJsonAsync("add_urls/associate_url",
             new
             {
                 hash,
                 urls_to_add = urls
-            });
+            },
+            cancellationToken: cancellationToken);
 
         response.EnsureSuccessStatusCode();
     }
 
-    public async Task AddTagsToImage(string hash, IEnumerable<string> tags, string service)
+    public async Task AddTagsToImage(string hash, IEnumerable<string> tags, string service, CancellationToken cancellationToken = default)
     {
         var serviceTags = new Dictionary<string, List<string>>
         {
@@ -82,7 +83,7 @@ public sealed class HydrusClient(HttpClient client, ILogger<HydrusClient> logger
             service_keys_to_tags = serviceTags
         };
 
-        var response = await client.PostAsJsonAsync("add_tags/add_tags", body);
+        var response = await client.PostAsJsonAsync("add_tags/add_tags", body, cancellationToken: cancellationToken);
 
         response.EnsureSuccessStatusCode();
     }
