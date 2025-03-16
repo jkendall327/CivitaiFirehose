@@ -1,5 +1,8 @@
 namespace CivitaiFirehose;
 
+/// <summary>
+/// Represents an image.
+/// </summary>
 public record ImageModel(string ImageUrl, int PostId, string Username, List<string> Tags, DateTime CreatedAt)
 {
     public string PostUrl => $"https://civitai.com/posts/{PostId.ToString()}";
